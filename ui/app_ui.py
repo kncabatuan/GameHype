@@ -18,36 +18,53 @@ class AppUI:
         self.root.title("GameHype")
         screen_height = self.root.winfo_screenheight()
         screen_width = self.root.winfo_screenwidth()
-        y = (screen_height - 700) // 2
-        x = (screen_width - 600) // 2
+        y = (screen_height - 600) // 2
+        x = (screen_width - 500) // 2
         self.root.geometry(f"500x500+{x}+{y}")
         self.root.resizable(False, False)
 
     def create_main_header(self) -> None:
         main_label = tk.Label(self.root, text="Welcome to GameHype!", font=("Arial", 18))
-        main_label.pack(pady=50)
+        main_label.pack(pady=40)
 
     def create_sub_header(self) -> None:
-        sub_header_frame = tk.Frame()
+        sub_header_frame = tk.Frame(self.root)
         sub_header_frame.pack(pady=(0, 30))
 
         sub_label = tk.Label(sub_header_frame, text="Please select a game to hype check", font=("Arial", 12))
         sub_label.pack()
 
     def create_entry(self) -> None:
-        entry_frame = tk.Frame()
-        entry_frame.pack(pady=(10,20))
+        entry_frame = tk.Frame(self.root, height=80, width=400)
+        entry_frame.pack_propagate(False)
+        entry_frame.pack(pady=(0,20))
 
-        self.entry_box = tk.Entry(entry_frame, font=("Arial", 10), width=60)
-        self.entry_box.pack(side="top", fill="x")
+        self.entry_box = tk.Entry(entry_frame, font=("Arial", 10))
+        self.entry_box.pack(side="top", fill="x", padx=10)
 
-        self.list_box = tk.Listbox(entry_frame, height=self.list_box_height)
+        self.list_box_frame = tk.Frame(entry_frame)
+
+        self.list_box = tk.Listbox(
+            self.list_box_frame, 
+            height=self.list_box_height,
+            selectbackground="#d0d0d0",
+            selectforeground="black",
+            activestyle="none",
+        )
+        self.list_box.pack(side="left", fill="both", expand=True)
+
+        self.scroll_bar = tk.Scrollbar(self.list_box_frame, orient="vertical")
+
+        self.list_box.config(yscrollcommand=self.scroll_bar.set)
+        self.scroll_bar.config(command=self.list_box.yview)
         
         self.entry_box.bind("<KeyRelease>", self.controller.on_key_release)
+        self.list_box.bind("<Motion>", self.controller.on_listbox_hover)
+        self.list_box.bind("<Leave>", lambda e: self.list_box.selection_clear(0, tk.END))
 
     def create_main_button(self) -> None:
-        main_button_frame = tk.Frame()
-        main_button_frame.pack(pady=(80, 30))
+        main_button_frame = tk.Frame(self.root)
+        main_button_frame.pack(pady=(0, 30))
 
         self.main_button = tk.Button(
             main_button_frame, 
@@ -64,7 +81,7 @@ class AppUI:
         self.main_button.bind("<Leave>", lambda e: self.main_button.config(bg="#e0e0e0"))
 
     def create_main_display(self) -> None:
-        main_display_frame = tk.Frame()
+        main_display_frame = tk.Frame(self.root)
         main_display_frame.pack(pady=(10, 30))
 
         self.main_display = tk.Label(main_display_frame, text=self.controller.display, font=("Arial", 12))

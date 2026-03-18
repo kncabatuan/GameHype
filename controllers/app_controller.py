@@ -27,16 +27,27 @@ class UIController:
 
                 if len(results) > 3:
                     self.ui.list_box_height = 3
+                    self.ui.scroll_bar.pack(side="right", fill="y")
                 else:
                     self.ui.list_box_height = len(results)
+
+                self.ui.list_box.config(height=self.ui.list_box_height)
             
                 for title in results:
                     self.ui.list_box.insert(tk.END, title)
 
-                self.ui.list_box.pack(side="top", fill="x")
+                self.ui.list_box_frame.pack(side="top", fill="x", padx=10)
+                
             else:
-                self.ui.list_box.pack_forget()
+                self.ui.list_box_frame.pack_forget()
         else:
-            self.ui.list_box.pack_forget()
+            self.ui.list_box_frame.pack_forget()
+
+    def on_listbox_hover(self, event):
+        index = self.ui.list_box.nearest(event.y)
+
+        self.ui.list_box.selection_clear(0, tk.END)
+        self.ui.list_box.selection_set(index)
+        self.ui.list_box.activate(index)
             
         
