@@ -49,5 +49,20 @@ class UIController:
         self.ui.list_box.selection_clear(0, tk.END)
         self.ui.list_box.selection_set(index)
         self.ui.list_box.activate(index)
+
+    def on_listbox_click(self, event):
+        selection = self.ui.list_box.curselection()
+
+        if selection:
+            index = selection[0]
+
+            selected_game = self.ui.list_box.get(index)
+
+            self.ui.entry_box.delete(0, tk.END)
+            self.ui.entry_box.insert(0, selected_game)
+
+            self.ui.list_box_frame.pack_forget()
+
+            self.ui.entry_box.icursor(tk.END)
             
         
