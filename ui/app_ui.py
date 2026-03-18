@@ -6,8 +6,10 @@ from controllers import app_controller
 class AppUI:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.controller = app_controller.UIController()
+        self.controller = app_controller.UIController(self)
         self.entry_box = tk.Entry
+        self.list_box = tk.Listbox
+        self.list_box_height = 0
         self.main_button = tk.Button
         self.main_display = tk.Label
         self.create_widgets()
@@ -32,16 +34,20 @@ class AppUI:
         sub_label = tk.Label(sub_header_frame, text="Please select a game to hype check", font=("Arial", 12))
         sub_label.pack()
 
-    def create_entry_box(self) -> None:
-        entry_box_frame = tk.Frame()
-        entry_box_frame.pack(pady=(10,20))
+    def create_entry(self) -> None:
+        entry_frame = tk.Frame()
+        entry_frame.pack(pady=(10,20))
 
-        self.entry_box = tk.Entry(entry_box_frame, font=("Arial", 10), width=60)
-        self.entry_box.pack()
+        self.entry_box = tk.Entry(entry_frame, font=("Arial", 10), width=60)
+        self.entry_box.pack(side="top", fill="x")
+
+        self.list_box = tk.Listbox(entry_frame, height=self.list_box_height)
+        
+        self.entry_box.bind("<KeyRelease>", self.controller.on_key_release)
 
     def create_main_button(self) -> None:
         main_button_frame = tk.Frame()
-        main_button_frame.pack(pady=(10, 30))
+        main_button_frame.pack(pady=(80, 30))
 
         self.main_button = tk.Button(
             main_button_frame, 
@@ -68,7 +74,7 @@ class AppUI:
         self.config_window()
         self.create_main_header()
         self.create_sub_header()
-        self.create_entry_box()
+        self.create_entry()
         self.create_main_button()
         self.create_main_display()
 
