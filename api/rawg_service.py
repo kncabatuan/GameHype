@@ -12,10 +12,14 @@ def get_game_titles(title_input: str) -> List[str]:
     
     try:
         url = f"https://api.rawg.io/api/games?search={title_input}&key={api_key}"
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
 
         return [game["name"] for game in data.get("results", [])]
-    except Exception:
-        raise
+    except requests.exceptions.HTTPError:
+        ...
+    except requests.exceptions.ConnectionError:
+        ...
+    except requests.exceptions.Timeout:
+        ...
