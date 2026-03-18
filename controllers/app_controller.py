@@ -1,6 +1,8 @@
 import tkinter as tk
 from typing import List, Any, TYPE_CHECKING
 
+from api import rawg_service
+
 if TYPE_CHECKING:
     from ui.app_ui import AppUI
 
@@ -18,9 +20,10 @@ class UIController:
         self.search_timer = self.ui.root.after(500, self.get_titles)
 
     def get_titles(self) -> List[Any]:
-        query = self.ui.entry_box.get()
-        if len(query) >= 3:
-            results = ["Witcher", "Witcher 2", "Witcher 3", "Witcher 4"]
+        query_title = self.ui.entry_box.get()
+        if len(query_title) >= 3:
+
+            results = rawg_service.get_game_titles(query_title)
 
             if results:
                 self.ui.list_box.delete(0, tk.END)
