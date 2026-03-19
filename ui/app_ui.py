@@ -75,6 +75,7 @@ class AppUI:
             font=("Arial", 14),
             width=12,
             height=1,
+            command=self.controller.on_go_click,
         )
         self.main_button.pack()
 
