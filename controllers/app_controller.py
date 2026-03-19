@@ -79,10 +79,14 @@ class UIController:
             self.ui.list_box_frame.pack_forget()
 
             self.ui.entry_box.icursor(tk.END)
-    
+
+    def on_mouse_wheel(self, event):
+        direction = int(-1 * (event.delta / 120))
+        self.ui.list_box.yview_scroll(direction, "units")
+        return "break"
+
     def on_go_click(self):
         self.game_title = self.ui.entry_box.get()
-
         if not self.game_title:
             messagebox.showerror("No input", "There is no input. Please enter a valid game title")
             

@@ -74,6 +74,7 @@ class AppUI:
         self.list_box.bind("<Motion>", self.controller.on_listbox_hover)
         self.list_box.bind("<Leave>", lambda e: self.list_box.selection_clear(0, tk.END))
         self.list_box.bind("<<ListboxSelect>>", self.controller.on_listbox_click)
+        self.list_box.bind("<MouseWheel>", self.controller.on_mouse_wheel)
 
     def create_main_button(self) -> None:
         main_button_frame = tk.Frame(self.left_frame)
