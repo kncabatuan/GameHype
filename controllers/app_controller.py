@@ -15,7 +15,7 @@ class UIController:
         self.debounce_counter = None
         self.game_title = None
 
-    def on_key_release(self, event):
+    def on_key_release(self, event) -> None:
         if self.debounce_counter:
             self.ui.root.after_cancel(self.debounce_counter)
 
@@ -31,12 +31,12 @@ class UIController:
         thread.daemon = True
         thread.start()
 
-    def fetch_title_data(self, query_title) -> List[Any]:
+    def fetch_title_data(self, query_title) -> None:
         if len(query_title) >= 3:
             results = rawg_service.get_game_titles(query_title)
             self.ui.root.after(0, self.update_list_box, results)
         else:
-            self.ui.list_box_frame.pack_forget()  
+            self.ui.root.after(0, self.ui.list_box_frame.pack_forget)
 
     def update_list_box(self, results: List[Any]) -> None:
         if results:
