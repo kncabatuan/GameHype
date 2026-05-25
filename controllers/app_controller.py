@@ -34,7 +34,7 @@ class UIController:
     def fetch_title_data(self, query_title) -> None:
         if len(query_title) >= 3:
             results = rawg_service.get_game_titles(query_title)
-            self.ui.root.after(0, self.update_list_box, results)
+            self.ui.root.after(0, self.update_list_box, results)    
         else:
             self.ui.root.after(0, self.ui.list_box_frame.pack_forget)
 
@@ -53,7 +53,7 @@ class UIController:
             for title in results:
                 self.ui.list_box.insert(tk.END, title)
 
-            self.ui.list_box_frame.pack(side="top", fill="x", padx=10)
+            self.ui.list_box_frame.pack(side="top", fill="both", expand="True", padx=10)
             
         else:
             self.ui.list_box_frame.pack_forget()
@@ -80,6 +80,16 @@ class UIController:
 
             self.ui.entry_box.icursor(tk.END)
 
+            thread = threading.Thread(target=self.get_game_details, args=(selected_game,))
+            thread.daemon=True
+            thread.start()
+
+    def get_game_details(self, game: str) -> None:
+        if not game:
+            return None
+        
+        results = rawg_service.get_game_details(game)
+
     def on_mouse_wheel(self, event):
         direction = int(-1 * (event.delta / 120))
         self.ui.list_box.yview_scroll(direction, "units")
@@ -89,5 +99,4 @@ class UIController:
         self.game_title = self.ui.entry_box.get()
         if not self.game_title:
             messagebox.showerror("No input", "There is no input. Please enter a valid game title")
-            
         
