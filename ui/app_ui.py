@@ -7,6 +7,8 @@ class AppUI:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
         self.controller = app_controller.UIController(self)
+        self.left_frame = tk.Frame
+        self.right_frame = tk.Frame
         self.entry_box = tk.Entry
         self.list_box = tk.Listbox
         self.list_box_height = 0
@@ -27,8 +29,8 @@ class AppUI:
         self.root.columnconfigure(0, weight=1, uniform="group1")
         self.root.columnconfigure(1, weight=1, uniform="group1")
         self.root.rowconfigure(0, weight=1)
-        self.left_frame = tk.Frame(self.root, bd=1, relief="solid")
-        self.right_frame = tk.Frame(self.root, bd=1, relief="solid")
+        self.left_frame = tk.Frame(self.root)
+        self.right_frame = tk.Frame(self.root)
         self.left_frame.grid(row=0, column=0, sticky="nsew")
         self.right_frame.grid(row=0, column=1, sticky="nsew")
 
@@ -54,7 +56,7 @@ class AppUI:
         self.entry_box = tk.Entry(entry_frame, font=("Arial", 10))
         self.entry_box.pack(side="top", fill="x", padx=10)
 
-        self.list_box_frame = tk.Frame(entry_frame, bd=2, relief="ridge")
+        self.list_box_frame = tk.Frame(entry_frame, bd=3, relief="ridge")
 
         self.list_box = tk.Listbox(
             self.list_box_frame, 
