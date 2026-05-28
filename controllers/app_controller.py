@@ -14,6 +14,7 @@ class UIController:
         self.display = "Ready to process"
         self.debounce_counter = None
         self.game_title = None
+        self.is_canceled = False
 
     def on_key_release(self, event) -> None:
         if self.debounce_counter:
@@ -66,6 +67,7 @@ class UIController:
         self.ui.list_box.activate(index)
 
     def on_listbox_click(self, event):
+        self.status_display_controller("fetching")
         selection = self.ui.list_box.curselection()
 
         if selection:
@@ -78,7 +80,7 @@ class UIController:
 
             self.ui.list_box_frame.pack_forget()
 
-            self.ui.entry_box.icursor(tk.END)
+            self.ui.entry_box.config(state="disabled")
 
             thread = threading.Thread(target=self.get_game_details, args=(selected_game,))
             thread.daemon=True
@@ -86,9 +88,15 @@ class UIController:
 
     def get_game_details(self, game: str) -> None:
         if not game:
+            self.ui.entry_box.config(state="normal")
             return None
         
         results = rawg_service.get_game_details(game)
+
+        self.ui.entry_box.config(state="normal")
+        self.status_display_controller("check_hype")
+        self.ui.entry_box.icursor(tk.END)
+        
 
     def on_mouse_wheel(self, event):
         direction = int(-1 * (event.delta / 120))
@@ -99,4 +107,15 @@ class UIController:
         self.game_title = self.ui.entry_box.get()
         if not self.game_title:
             messagebox.showerror("No input", "There is no input. Please enter a valid game title")
+
+    def status_display_controller(self, status: str) -> None:
+        match status:
+            case "ready":
+                self.display = "Ready to process"
+            case "fetching":
+                self.display = "Fetching data..."
+            case "check_hype":
+                self.display = "Wanna check hype? Press go!"
+
+        self.ui.status_display.config(text=self.display)
         
