@@ -91,12 +91,11 @@ class UIController:
             self.ui.entry_box.config(state="normal")
             return None
         
-        results = rawg_service.get_game_details(game)
+        game_data = rawg_service.get_game_details(game)
 
         self.ui.entry_box.config(state="normal")
         self.status_display_controller("check_hype")
         self.ui.entry_box.icursor(tk.END)
-        
 
     def on_mouse_wheel(self, event):
         direction = int(-1 * (event.delta / 120))

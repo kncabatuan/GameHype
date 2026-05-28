@@ -1,5 +1,4 @@
 import os
-import pprint
 import requests
 from dotenv import load_dotenv
 from typing import List
@@ -35,7 +34,8 @@ def get_game_details(game: str):
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
+
+        return data.get("results", [])[0]
+
     except requests.exceptions.RequestException:
         pass
-
-    pprint.pprint(data)
