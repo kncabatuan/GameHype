@@ -14,6 +14,7 @@ class AppUI:
         self.list_box_height = 0
         self.main_button = tk.Button
         self.status_display = tk.Label
+        self.image_label = tk.Label
         self.create_widgets()
     
     def config_window(self) -> None:
@@ -105,7 +106,7 @@ class AppUI:
         self.status_display.pack()
 
     def create_image_display(self) -> None:
-        image_display_frame = tk.Frame(self.right_frame, height=250, bd=2, relief="ridge")
+        image_display_frame = tk.Frame(self.right_frame, height=250)
         image_display_frame.pack_propagate(False)
         image_display_frame.pack(fill="x", pady=(10, 30))
 
@@ -115,6 +116,9 @@ class AppUI:
         image_frame = tk.Frame(image_display_frame)
         image_frame.pack_propagate(False)
         image_frame.pack(fill="both", expand=True, padx=5, pady=5)
+
+        self.image_label = tk.Label(image_frame)
+        self.image_label.pack(fill="both", expand=True)
     
     def create_game_details_display(self) -> None:
         game_details_frame = tk.Frame(self.right_frame, height=250, bd=2, relief="ridge")

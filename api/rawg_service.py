@@ -35,7 +35,7 @@ def get_game_details(game: str):
         response.raise_for_status()
         data = response.json()
 
-        return data.get("results", [])[0]
-
     except requests.exceptions.RequestException:
-        pass
+        return {}
+    
+    return data.get("results", [])[0]

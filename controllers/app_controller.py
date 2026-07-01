@@ -1,5 +1,8 @@
+import io
+import requests
 import threading
 import tkinter as tk
+from PIL import Image, ImageTk
 from tkinter import messagebox
 from typing import List, Any, TYPE_CHECKING
 
@@ -14,6 +17,7 @@ class UIController:
         self.display = "Ready to process"
         self.debounce_counter = None
         self.game_title = None
+        self.game_image = None
         self.is_canceled = False
 
     def on_key_release(self, event) -> None:
@@ -92,10 +96,44 @@ class UIController:
             return None
         
         game_data = rawg_service.get_game_details(game)
+        image_url = game_data.get("background_image", None)
+
+        if image_url:
+            self.display_game_image(image_url)
+        else:
+            self.ui.root.after(0, self.ui.image_label.config, {"image": ""})
 
         self.ui.entry_box.config(state="normal")
         self.status_display_controller("check_hype")
         self.ui.entry_box.icursor(tk.END)
+
+    def display_game_image(self, image_url: str) -> None:
+        photo = self.load_game_image(image_url)
+
+        if photo:
+            self.game_image = photo
+            self.ui.image_label.config(image=self.game_image)
+        else:
+            self.game_image = None
+            self.ui.image_label.config(image="")
+        
+    def load_game_image(self, image_url: str, target_height=200) -> ImageTk.PhotoImage | None:
+        try:
+            response = requests.get(image_url, timeout=10)
+            response.raise_for_status()
+        except Exception:
+            return None
+
+        image_data = io.BytesIO(response.content)
+        img = Image.open(image_data)
+
+        image_width, image_height = img.size
+        aspect_ratio = image_width / image_height
+        calculated_width = int(target_height * aspect_ratio)
+
+        img = img.resize((calculated_width, target_height), Image.Resampling.LANCZOS)
+
+        return ImageTk.PhotoImage(img)
 
     def on_mouse_wheel(self, event):
         direction = int(-1 * (event.delta / 120))
