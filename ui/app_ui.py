@@ -15,6 +15,10 @@ class AppUI:
         self.main_button = tk.Button
         self.status_display = tk.Label
         self.image_label = tk.Label
+        self.game_detail_title = tk.Label
+        self.game_detail_release = tk.Label
+        self.game_detail_dev = tk.Label
+        self.game_detail_metacritic = tk.Label
         self.create_widgets()
     
     def config_window(self) -> None:
@@ -124,6 +128,16 @@ class AppUI:
         game_details_frame = tk.Frame(self.right_frame, height=250, bd=2, relief="ridge")
         game_details_frame.pack_propagate(False)
         game_details_frame.pack(pady=(10,30), fill="x")
+
+        self.game_detail_title = tk.Label(game_details_frame, text="Title:", font=("Arial", 12))
+        self.game_detail_release = tk.Label(game_details_frame, text="Release Date:", font=("Arial", 12))
+        self.game_detail_dev = tk.Label(game_details_frame, text="Developer/s:", font=("Arial", 12))
+        self.game_detail_metacritic = tk.Label(game_details_frame, text="Metacritic Score:", font=("Arial", 12))
+
+        self.game_detail_title.pack(anchor="w", padx=10, pady=(10, 5))
+        self.game_detail_release.pack(anchor="w", padx=10, pady=5)
+        self.game_detail_dev.pack(anchor="w", padx=10, pady=5)
+        self.game_detail_metacritic.pack(anchor="w", padx=10, pady=5)
 
     def create_widgets(self) -> None:
         self.config_window()

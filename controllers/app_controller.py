@@ -103,6 +103,8 @@ class UIController:
         else:
             self.ui.root.after(0, self.ui.image_label.config, {"image": ""})
 
+        self.display_game_details(game_data)
+
         self.ui.entry_box.config(state="normal")
         self.status_display_controller("check_hype")
         self.ui.entry_box.icursor(tk.END)
@@ -134,6 +136,17 @@ class UIController:
         img = img.resize((calculated_width, target_height), Image.Resampling.LANCZOS)
 
         return ImageTk.PhotoImage(img)
+    
+    def display_game_details(self, game_data: dict) -> None:
+        game_title = game_data.get("name", "N/A")
+        game_release = game_data.get("released", "N/A")
+        game_developer = [dev["name"] for dev in game_data.get("developers", [])]
+        game_metacritic = game_data.get("metacritic", "N/A")
+
+        self.ui.game_detail_title.config(text=f"Title: {game_title}")
+        self.ui.game_detail_release.config(text=f"Release Date: {game_release}")
+        self.ui.game_detail_dev.config(text=f"Developer/s: {', '.join(game_developer) if game_developer else 'N/A'}")
+        self.ui.game_detail_metacritic.config(text=f"Metacritic Score: {game_metacritic}")
 
     def on_mouse_wheel(self, event):
         direction = int(-1 * (event.delta / 120))
