@@ -30,6 +30,7 @@ class UIController:
         query_title = self.ui.entry_box.get()
         if not query_title:
             self.ui.list_box_frame.pack_forget()
+            self.status_display_controller("ready")
             return None
         
         thread = threading.Thread(target = self.fetch_title_data, args=(query_title,))
@@ -71,13 +72,12 @@ class UIController:
         self.ui.list_box.activate(index)
 
     def on_listbox_click(self, event):
-        self.status_display_controller("fetching")
-        selection = self.ui.list_box.curselection()
+        index = self.ui.list_box.nearest(event.y)
 
-        if selection:
-            index = selection[0]
-
+        if index >= 0 and self.ui.list_box.size() > 0:
             selected_game = self.ui.list_box.get(index)
+
+            self.status_display_controller("fetching")
 
             self.ui.entry_box.delete(0, tk.END)
             self.ui.entry_box.insert(0, selected_game)
