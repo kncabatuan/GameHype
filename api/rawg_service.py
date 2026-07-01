@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 from dotenv import load_dotenv
@@ -33,9 +34,20 @@ def get_game_details(game: str):
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
-        data = response.json()
-
+        data_json = response.json()
     except requests.exceptions.RequestException:
         return {}
     
-    return data.get("results", [])[0]
+    game_data =  data_json.get("results", [])[0]
+    game_id = game_data.get("id")
+
+    game_detail_url = f"https://api.rawg.io/api/games/{game_id}?key={api_key}"
+
+    try:
+        detailed_response = requests.get(game_detail_url, timeout=10)
+        detailed_response.raise_for_status()
+        detailed_game_data = detailed_response.json()
+    except requests.exceptions.RequestException:
+        return {}
+
+    return detailed_game_data
