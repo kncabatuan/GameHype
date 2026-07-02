@@ -1,8 +1,7 @@
-import json
 import os
 import requests
 from dotenv import load_dotenv
-from typing import List
+from typing import List, Dict, Any
 
 load_dotenv()
 api_key = os.getenv("RAWG_API_KEY")
@@ -23,7 +22,7 @@ def get_game_titles(title_input: str) -> List[str]:
     return [game["name"] for game in data.get("results", [])]
 
 
-def get_game_details(game: str):
+def get_game_details(game: str) -> Dict[str: Any]:
     if not api_key:
         return {}
     
