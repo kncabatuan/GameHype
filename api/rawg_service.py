@@ -4,8 +4,6 @@ import requests
 from dotenv import load_dotenv
 from typing import List
 
-from models import game
-
 load_dotenv()
 api_key = os.getenv("RAWG_API_KEY")
 
