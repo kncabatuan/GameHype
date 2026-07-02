@@ -139,14 +139,26 @@ class UIController:
     
     def display_game_details(self, game_data: dict) -> None:
         game_title = game_data.get("name", "N/A")
+        if len(game_title) > 50:
+            game_title = game_title[:50] + "..."
+
+        developer_names = [dev["name"] for dev in game_data.get("developers", [])]
+        game_developer = ', '.join(developer_names) if developer_names else "N/A"
+        if len(game_developer) > 50:
+            game_developer = game_developer[:50] + "..."
+
         game_release = game_data.get("released", "N/A")
-        game_developer = [dev["name"] for dev in game_data.get("developers", [])]
         game_metacritic = game_data.get("metacritic", "N/A")
 
         self.ui.game_detail_title.config(text=f"Title: {game_title}")
         self.ui.game_detail_release.config(text=f"Release Date: {game_release}")
-        self.ui.game_detail_dev.config(text=f"Developer/s: {', '.join(game_developer) if game_developer else 'N/A'}")
+        self.ui.game_detail_dev.config(text=f"Developer/s: {game_developer}")
         self.ui.game_detail_metacritic.config(text=f"Metacritic Score: {game_metacritic}")
+
+        self.ui.game_detail_title.pack(pady=(10, 5))
+        self.ui.game_detail_release.pack(pady=5)
+        self.ui.game_detail_dev.pack(pady=5)
+        self.ui.game_detail_metacritic.pack(pady=5)
 
     def on_mouse_wheel(self, event):
         direction = int(-1 * (event.delta / 120))
