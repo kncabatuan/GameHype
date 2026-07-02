@@ -17,3 +17,11 @@ def test_wrong_api_key():
             mock_get.side_effect = requests.exceptions.HTTPError("401 Client Error: Unauthorized")
         
             assert rawg_service.get_game_titles(test_game_title) == []
+
+def test_request_exception():
+    test_game_title = "Stardew Valley"
+
+    with patch('api.rawg_service.requests.get') as mock_get:
+        mock_get.side_effect = requests.exceptions.RequestException("Network error")
+
+        assert rawg_service.get_game_titles(test_game_title) == []
