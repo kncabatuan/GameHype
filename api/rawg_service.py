@@ -19,8 +19,7 @@ def get_game_titles(title_input: str) -> List[str]:
     except requests.exceptions.RequestException:
         return []
 
-    return [game["name"] for game in data.get("results", [])]
-
+    return [game.get("name", "Unknown Game") for game in data.get("results", [])]
 
 def get_game_details(game: str) -> Dict[str, Any]:
     if not api_key:
