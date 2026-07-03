@@ -22,7 +22,7 @@ def get_game_titles(title_input: str) -> List[str]:
     return [game["name"] for game in data.get("results", [])]
 
 
-def get_game_details(game: str) -> Dict[str: Any]:
+def get_game_details(game: str) -> Dict[str, Any]:
     if not api_key:
         return {}
     
