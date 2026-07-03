@@ -22,7 +22,7 @@ def get_game_titles(title_input: str) -> List[str]:
     return [game.get("name", "Unknown Game") for game in data.get("results", [])]
 
 def get_game_details(game: str) -> Dict[str, Any]:
-    if not api_key:
+    if not api_key or not game:
         return {}
     
     url = f"https://api.rawg.io/api/games?search={game}&key={api_key}"
