@@ -35,9 +35,12 @@ def get_game_details(game: str) -> Dict[str, Any]:
         return {}
     
     game_data =  data_json.get("results", [])[0]
-    game_id = game_data.get("id")
+    game_id = game_data.get("id", None)
 
-    game_detail_url = f"https://api.rawg.io/api/games/{game_id}?key={api_key}"
+    if game_id:
+        game_detail_url = f"https://api.rawg.io/api/games/{game_id}?key={api_key}"
+    else:
+        return game_data
 
     try:
         detailed_response = requests.get(game_detail_url, timeout=10)
