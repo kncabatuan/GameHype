@@ -34,7 +34,8 @@ def get_game_details(game: str) -> Dict[str, Any]:
     except requests.exceptions.RequestException:
         return {}
     
-    game_data =  data_json.get("results", [])[0]
+    result = data_json.get("results", [])
+    game_data =  result[0] if result else {}
     game_id = game_data.get("id", None)
 
     if game_id:
