@@ -99,7 +99,7 @@ def test_wrong_api_key_for_details():
             assert rawg_service.get_game_details(test_game_title) == {}
 
 @patch('api.rawg_service.requests.get')
-def test_no_api_key_for_details_second_fail(mock_get):
+def test_api_second_call_fail(mock_get):
     mock_response_1 = MagicMock()
     mock_response_1.json.return_value = {'results': [{'id': 12345}]}
 
@@ -115,7 +115,7 @@ def test_no_api_key_for_details_second_fail(mock_get):
 
 def test_no_results_for_details():
     test_game_title = 'Stardew Valley'
-    test_game_response_data = {}
+    test_game_response_data = {'results': []}
 
     with patch("api.rawg_service.requests.get") as mock_get:
         mock_response = Mock()
