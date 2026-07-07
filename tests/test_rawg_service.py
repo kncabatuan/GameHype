@@ -131,6 +131,33 @@ def test_no_results_for_details():
 
         assert rawg_service.get_game_details(test_game_title) == {}
 
-#Test no results
-#Test no id
-#Test success
+def test_no_id_for_details():
+    test_game_title = 'Stardew Valley'
+    test_game_response_data = {'results': [{'name': 'stardew_valley 1'}, {'name': 'stardew_valley 2'}]}
+
+    with patch("api.rawg_service.requests.get") as mock_get:
+        mock_response = Mock()
+        mock_response.json.return_value = test_game_response_data
+        mock_response.raise_for_status.return_value = None
+
+        mock_get.return_value = mock_response
+
+        assert rawg_service.get_game_details(test_game_title) == {'name': 'stardew_valley 1'}
+
+def test_get_game_details():
+    test_game_title = 'Stardew Valley'
+    test_game_response_data = {'results': [{'id': 12345, 'name': 'stardew_valley 1'}, {'id': 67890, 'name': 'stardew valley 2'}]}
+    test_game_response_detailed_data = {'id': 12345, 'name': 'stardew_valley 1', 'description': 'farming'}
+
+    with patch("api.rawg_service.requests.get") as mock_get:
+        mock_response_1 = MagicMock()
+        mock_response_1.json.return_value = test_game_response_data
+
+        mock_response_2 = MagicMock()
+        mock_response_2.json.return_value = test_game_response_detailed_data
+
+        mock_get.side_effect = [mock_response_1, mock_response_2]
+
+        result = rawg_service.get_game_details(test_game_title)
+        assert result == test_game_response_detailed_data
+        assert mock_get.call_count == 2
