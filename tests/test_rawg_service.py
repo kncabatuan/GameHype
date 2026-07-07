@@ -80,14 +80,14 @@ def test_get_game_titles():
 
 # Test cases for get_game_details
 def test_no_game():
-    test_game = ""
-    assert rawg_service.get_game_details(test_game) == {}
+    test_game_title = ""
+    assert rawg_service.get_game_details(test_game_title) == {}
 
 def test_no_api_key_for_details():
-    test_game = "Stardew Valley"
+    test_game_title = "Stardew Valley"
 
     with patch('api.rawg_service.api_key', None):
-        assert rawg_service.get_game_details(test_game) == {}
+        assert rawg_service.get_game_details(test_game_title) == {}
 
     with patch('api.rawg_service.requests.get') as mock_get:
         mock_get = Mock()
@@ -95,13 +95,13 @@ def test_no_api_key_for_details():
         mock_get.raise_for_status.return_value = None
 
 def test_wrong_api_key_for_details():
-    test_game = "Stardew Valley"
+    test_game_title = "Stardew Valley"
 
     with patch('api.rawg_service.api_key', 'wrong_key'):
         with patch('api.rawg_service.requests.get') as mock_get:
             mock_get.side_effect = requests.exceptions.HTTPError("401 Client Error: Unauthorized")
 
-            assert rawg_service.get_game_details(test_game) == {}
+            assert rawg_service.get_game_details(test_game_title) == {}
 
 @patch('api.rawg_service.requests.get')
 def test_no_api_key_for_details_second_fail(mock_get):
@@ -117,6 +117,19 @@ def test_no_api_key_for_details_second_fail(mock_get):
 
     assert result == {}
     assert mock_get.call_count == 2
+
+def test_no_results_for_details():
+    test_game_title = 'Stardew Valley'
+    test_game_response_data = {}
+
+    with patch("api.rawg_service.requests.get") as mock_get:
+        mock_response = Mock()
+        mock_response.json.return_value = test_game_response_data
+        mock_response.raise_for_status.return_value = None
+
+        mock_get.return_value = mock_response
+
+        assert rawg_service.get_game_details(test_game_title) == {}
 
 #Test no results
 #Test no id
