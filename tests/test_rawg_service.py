@@ -89,11 +89,6 @@ def test_no_api_key_for_details():
     with patch('api.rawg_service.api_key', None):
         assert rawg_service.get_game_details(test_game_title) == {}
 
-    with patch('api.rawg_service.requests.get') as mock_get:
-        mock_get = Mock()
-        mock_get.json.return_value = {}
-        mock_get.raise_for_status.return_value = None
-
 def test_wrong_api_key_for_details():
     test_game_title = "Stardew Valley"
 
