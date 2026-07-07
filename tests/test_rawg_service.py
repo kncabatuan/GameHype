@@ -1,5 +1,5 @@
 from api import rawg_service
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, MagicMock
 import requests
 
 # Test cases for get_game_titles
@@ -93,7 +93,6 @@ def test_no_api_key_for_details():
         mock_get = Mock()
         mock_get.json.return_value = {}
         mock_get.raise_for_status.return_value = None
-        
 
 def test_wrong_api_key_for_details():
     test_game = "Stardew Valley"
@@ -103,6 +102,21 @@ def test_wrong_api_key_for_details():
             mock_get.side_effect = requests.exceptions.HTTPError("401 Client Error: Unauthorized")
 
             assert rawg_service.get_game_details(test_game) == {}
+
+@patch('api.rawg_service.requests.get')
+def test_no_api_key_for_details_second_fail(mock_get):
+    mock_response_1 = MagicMock()
+    mock_response_1.json.return_value = {'results': [{'id': 12345}]}
+
+    mock_response_2 = MagicMock()
+    mock_response_2.raise_for_status.side_effect = requests.exceptions.HTTPError("401 Client Error: Unauthorized")
+
+    mock_get.side_effect = [mock_response_1, mock_response_2]
+
+    result = rawg_service.get_game_details("Stardew Valley")
+
+    assert result == {}
+    assert mock_get.call_count == 2
 
 #Test no results
 #Test no id
