@@ -12,6 +12,7 @@ from api import rawg_service
 if TYPE_CHECKING:
     from ui.app_ui import AppUI
 
+
 class UIController:
     def __init__(self, ui: "AppUI") -> None:
         self.ui = ui
@@ -34,15 +35,15 @@ class UIController:
             self.remove_game_details()
             self.status_display_controller("ready")
             return None
-        
-        thread = threading.Thread(target = self.fetch_title_data, args=(query_title,))
+
+        thread = threading.Thread(target=self.fetch_title_data, args=(query_title,))
         thread.daemon = True
         thread.start()
 
     def fetch_title_data(self, query_title) -> None:
         if len(query_title) >= 3:
             results = rawg_service.get_game_titles(query_title)
-            self.ui.root.after(0, self.update_list_box, results)    
+            self.ui.root.after(0, self.update_list_box, results)
         else:
             self.ui.root.after(0, self.ui.list_box_frame.pack_forget)
 
@@ -57,12 +58,12 @@ class UIController:
                 self.ui.list_box_height = len(results)
 
             self.ui.list_box.config(height=self.ui.list_box_height)
-        
+
             for title in results:
                 self.ui.list_box.insert(tk.END, title)
 
             self.ui.list_box_frame.pack(side="top", fill="both", expand="True", padx=10)
-            
+
         else:
             self.ui.list_box_frame.pack_forget()
 
@@ -88,15 +89,17 @@ class UIController:
 
             self.ui.entry_box.config(state="disabled")
 
-            thread = threading.Thread(target=self.get_game_details, args=(selected_game,))
-            thread.daemon=True
+            thread = threading.Thread(
+                target=self.get_game_details, args=(selected_game,)
+            )
+            thread.daemon = True
             thread.start()
 
     def get_game_details(self, game: str) -> None:
         if not game:
             self.ui.entry_box.config(state="normal")
             return None
-        
+
         self.game = game_details.Game(rawg_service.get_game_details(game))
         image_url = self.game.raw_data.get("background_image", None)
 
@@ -120,8 +123,10 @@ class UIController:
         else:
             self.game_image = None
             self.ui.image_label.config(image="")
-        
-    def load_game_image(self, image_url: str, target_height=200) -> ImageTk.PhotoImage | None:
+
+    def load_game_image(
+        self, image_url: str, target_height=200
+    ) -> ImageTk.PhotoImage | None:
         try:
             response = requests.get(image_url, timeout=10)
             response.raise_for_status()
@@ -138,19 +143,25 @@ class UIController:
         img = img.resize((calculated_width, target_height), Image.Resampling.LANCZOS)
 
         return ImageTk.PhotoImage(img)
-    
+
     def display_game_details(self, game_data: dict) -> None:
 
         processed_data = self.process_game_details(game_data)
-        
+
         self.ui.game_detail_title.config(text=f"Title: {processed_data['game_title']}")
-        self.ui.game_detail_release.config(text=f"Release Date: {processed_data['game_release']}")
-        self.ui.game_detail_dev.config(text=f"Developer/Publisher: {processed_data['game_developer']}")
-        
+        self.ui.game_detail_release.config(
+            text=f"Release Date: {processed_data['game_release']}"
+        )
+        self.ui.game_detail_dev.config(
+            text=f"Developer/Publisher: {processed_data['game_developer']}"
+        )
+
         if processed_data["game_metacritic"] == "Not available":
             self.ui.game_detail_metacritic.config(text="Metacritic Score: N/A")
         else:
-            self.ui.game_detail_metacritic.config(text=f"Metacritic Score: {processed_data['game_metacritic']}/100")
+            self.ui.game_detail_metacritic.config(
+                text=f"Metacritic Score: {processed_data['game_metacritic']}/100"
+            )
 
         self.ui.game_detail_title.pack(pady=(10, 5))
         self.ui.game_detail_release.pack(pady=5)
@@ -164,15 +175,22 @@ class UIController:
         if len(game_title) > 50:
             game_title = game_title[:50] + "..."
 
-        developer_names = [dev.get("name", "Not available") for dev in game_data.get("developers", [])]
-        game_developer = ', '.join(developer_names) if developer_names else "N/A"
+        developer_names = [
+            dev.get("name", "Not available") for dev in game_data.get("developers", [])
+        ]
+        game_developer = ", ".join(developer_names) if developer_names else "N/A"
         if len(game_developer) > 50:
             game_developer = game_developer[:50] + "..."
 
         game_release = game_data.get("released", "Not available")
         game_metacritic = game_data.get("metacritic", "Not available")
 
-        processed_data = {"game_title": game_title, "game_release": game_release, "game_developer": game_developer, "game_metacritic": game_metacritic}
+        processed_data = {
+            "game_title": game_title,
+            "game_release": game_release,
+            "game_developer": game_developer,
+            "game_metacritic": game_metacritic,
+        }
         return processed_data
 
     def on_mouse_wheel(self, event):
@@ -183,7 +201,9 @@ class UIController:
     def on_go_click(self):
         self.game_title = self.ui.entry_box.get()
         if not self.game_title:
-            messagebox.showerror("No input", "There is no input. Please enter a valid game title")
+            messagebox.showerror(
+                "No input", "There is no input. Please enter a valid game title"
+            )
 
     def status_display_controller(self, status: str) -> None:
         match status:
@@ -211,4 +231,3 @@ class UIController:
         self.ui.game_detail_dev.pack_forget()
         self.ui.game_detail_metacritic.pack_forget()
         self.ui.image_label.config(image="")
-        
