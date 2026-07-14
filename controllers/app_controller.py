@@ -33,7 +33,6 @@ class UIController:
             self.ui.list_box_frame.pack_forget()
             self.remove_game_details()
             self.status_display_controller("ready")
-            self.game = None
             return None
         
         thread = threading.Thread(target = self.fetch_title_data, args=(query_title,))
