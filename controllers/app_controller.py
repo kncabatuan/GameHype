@@ -18,7 +18,6 @@ class UIController:
         self.debounce_counter = None
         self.game_title = None
         self.game_image = None
-        self.is_canceled = False
 
     def on_key_release(self, event) -> None:
         if self.debounce_counter:
