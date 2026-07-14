@@ -67,3 +67,33 @@ def test_update_list_box_fail():
     controller.update_list_box(test_titles)
 
     mock_ui.list_box_frame.pack_forget.assert_called_once()
+
+
+def test_get_game_details_success():
+    test_game_title = "stardew valley"
+    test_game_data = {
+        "name": "Stardew Valley",
+        "released": "2016-02-26",
+        "developers": [{"name": "ConcernedApe"}],
+        "publishers": [{"name": "Chucklefish"}],
+        "metacritic": 89,
+        "background_image": "https://example.com/stardew_valley.jpg",
+    }
+    mock_ui = MagicMock()
+    controller = app_controller.UIController(mock_ui)
+    
+    with patch("api.rawg_service.get_game_details") as mock_get_game_details:
+        with patch("models.game_details.Game") as mock_game:
+            mock_get_game_details.return_value = test_game_data
+            controller.get_game_details(test_game_title)
+            mock_get_game_details.assert_called_once_with(test_game_title)
+            mock_game.assert_called_once_with(test_game_data)
+
+            
+        
+
+        
+    
+
+
+
