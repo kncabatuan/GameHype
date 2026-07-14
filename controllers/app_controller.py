@@ -141,7 +141,27 @@ class UIController:
         return ImageTk.PhotoImage(img)
     
     def display_game_details(self, game_data: dict) -> None:
-        game_title = game_data.get("name", "N/A")
+
+        processed_data = self.process_game_details(game_data)
+        
+        self.ui.game_detail_title.config(text=f"Title: {processed_data['game_title']}")
+        self.ui.game_detail_release.config(text=f"Release Date: {processed_data['game_release']}")
+        self.ui.game_detail_dev.config(text=f"Developer/Publisher: {processed_data['game_developer']}")
+        
+        if processed_data["game_metacritic"] == "Not available":
+            self.ui.game_detail_metacritic.config(text="Metacritic Score: N/A")
+        else:
+            self.ui.game_detail_metacritic.config(text=f"Metacritic Score: {processed_data['game_metacritic']}/100")
+
+        self.ui.game_detail_title.pack(pady=(10, 5))
+        self.ui.game_detail_release.pack(pady=5)
+        self.ui.game_detail_dev.pack(pady=5)
+        self.ui.game_detail_metacritic.pack(pady=5)
+
+        self.main_button_control("enable")
+
+    def process_game_details(self, game_data: dict) -> dict:
+        game_title = game_data.get("name", "Not available")
         if len(game_title) > 50:
             game_title = game_title[:50] + "..."
 
@@ -150,24 +170,11 @@ class UIController:
         if len(game_developer) > 50:
             game_developer = game_developer[:50] + "..."
 
-        game_release = game_data.get("released", "N/A")
-        game_metacritic = game_data.get("metacritic", "N/A")
+        game_release = game_data.get("released", "Not available")
+        game_metacritic = game_data.get("metacritic", "Not available")
 
-        self.ui.game_detail_title.config(text=f"Title: {game_title}")
-        self.ui.game_detail_release.config(text=f"Release Date: {game_release}")
-        self.ui.game_detail_dev.config(text=f"Developer/Publisher: {game_developer}")
-        
-        if game_metacritic is None:
-            self.ui.game_detail_metacritic.config(text="Metacritic Score: N/A")
-        else:
-            self.ui.game_detail_metacritic.config(text=f"Metacritic Score: {game_metacritic}/100")
-
-        self.ui.game_detail_title.pack(pady=(10, 5))
-        self.ui.game_detail_release.pack(pady=5)
-        self.ui.game_detail_dev.pack(pady=5)
-        self.ui.game_detail_metacritic.pack(pady=5)
-
-        self.main_button_control("enable")
+        processed_data = {"game_title": game_title, "game_release": game_release, "game_developer": game_developer, "game_metacritic": game_metacritic}
+        return processed_data
 
     def on_mouse_wheel(self, event):
         direction = int(-1 * (event.delta / 120))
