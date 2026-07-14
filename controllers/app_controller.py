@@ -19,7 +19,7 @@ class UIController:
         self.debounce_counter = None
         self.game_title = None
         self.game_image = None
-        self.game_data = game_details.Game
+        self.game = game_details.Game
 
     def on_key_release(self, event) -> None:
         if self.debounce_counter:
@@ -96,15 +96,15 @@ class UIController:
             self.ui.entry_box.config(state="normal")
             return None
         
-        selected_game = game_details.Game(rawg_service.get_game_details(game))
-        image_url = selected_game.raw_data.get("background_image", None)
+        self.game = game_details.Game(rawg_service.get_game_details(game))
+        image_url = self.game.raw_data.get("background_image", None)
 
         if image_url:
             self.display_game_image(image_url)
         else:
             self.ui.root.after(0, self.ui.image_label.config, {"image": ""})
 
-        self.display_game_details(selected_game.raw_data)
+        self.display_game_details(self.game.raw_data)
 
         self.ui.entry_box.config(state="normal")
         self.status_display_controller("check_hype")
