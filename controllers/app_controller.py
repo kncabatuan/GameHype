@@ -31,7 +31,9 @@ class UIController:
         query_title = self.ui.entry_box.get()
         if not query_title:
             self.ui.list_box_frame.pack_forget()
+            self.remove_game_details_from_ui()
             self.status_display_controller("ready")
+            self.game = None
             return None
         
         thread = threading.Thread(target = self.fetch_title_data, args=(query_title,))
@@ -193,4 +195,11 @@ class UIController:
             self.ui.main_button.config(state="normal")
         elif state == "disable":
             self.ui.main_button.config(state="disabled")
+
+    def remove_game_details_from_ui(self) -> None:
+        self.ui.game_detail_title.pack_forget()
+        self.ui.game_detail_release.pack_forget()
+        self.ui.game_detail_dev.pack_forget()
+        self.ui.game_detail_metacritic.pack_forget()
+        self.ui.image_label.config(image="")
         
