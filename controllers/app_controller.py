@@ -152,7 +152,7 @@ class UIController:
 
         self.ui.game_detail_title.config(text=f"Title: {game_title}")
         self.ui.game_detail_release.config(text=f"Release Date: {game_release}")
-        self.ui.game_detail_dev.config(text=f"Developer/s: {game_developer}")
+        self.ui.game_detail_dev.config(text=f"Developer/Publisher: {game_developer}")
         
         if game_metacritic is None:
             self.ui.game_detail_metacritic.config(text="Metacritic Score: N/A")

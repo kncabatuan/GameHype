@@ -131,7 +131,7 @@ class AppUI:
 
         self.game_detail_title = tk.Label(game_details_frame, text="Title:", font=("Arial", 10))
         self.game_detail_release = tk.Label(game_details_frame, text="Release Date:", font=("Arial", 10))
-        self.game_detail_dev = tk.Label(game_details_frame, text="Developer/s:", font=("Arial", 10))
+        self.game_detail_dev = tk.Label(game_details_frame, text="Developer/Publisher:", font=("Arial", 10))
         self.game_detail_metacritic = tk.Label(game_details_frame, text="Metacritic Score:", font=("Arial", 10))
 
     def create_widgets(self) -> None:
