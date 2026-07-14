@@ -164,6 +164,8 @@ class UIController:
         self.ui.game_detail_dev.pack(pady=5)
         self.ui.game_detail_metacritic.pack(pady=5)
 
+        self.main_button_control("enable")
+
     def on_mouse_wheel(self, event):
         direction = int(-1 * (event.delta / 120))
         self.ui.list_box.yview_scroll(direction, "units")
@@ -184,4 +186,10 @@ class UIController:
                 self.display = "Wanna check hype? Press go!"
 
         self.ui.status_display.config(text=self.display)
+
+    def main_button_control(self, state: str) -> None:
+        if state == "enable":
+            self.ui.main_button.config(state="normal")
+        elif state == "disable":
+            self.ui.main_button.config(state="disabled")
         

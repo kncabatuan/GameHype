@@ -97,6 +97,7 @@ class AppUI:
             height=1,
             command=self.controller.on_go_click,
         )
+        self.main_button.config(state="disabled")
         self.main_button.pack()
 
         self.main_button.bind("<Enter>", lambda e: self.main_button.config(bg="#d0d0d0"))
