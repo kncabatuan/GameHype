@@ -31,7 +31,7 @@ class UIController:
         query_title = self.ui.entry_box.get()
         if not query_title:
             self.ui.list_box_frame.pack_forget()
-            self.remove_game_details_from_ui()
+            self.remove_game_details()
             self.status_display_controller("ready")
             self.game = None
             return None
@@ -203,7 +203,10 @@ class UIController:
         elif state == "disable":
             self.ui.main_button.config(state="disabled")
 
-    def remove_game_details_from_ui(self) -> None:
+    def remove_game_details(self) -> None:
+        self.game_title = None
+        self.game_image = None
+        self.game = None
         self.ui.game_detail_title.pack_forget()
         self.ui.game_detail_release.pack_forget()
         self.ui.game_detail_dev.pack_forget()
