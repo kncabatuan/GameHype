@@ -150,3 +150,14 @@ def test_display_game_image_success(controller, mock_ui):
         controller.display_game_image(test_image_url)
         assert controller.game_image == fake_photo_object
         mock_ui.image_label.config.assert_called_once_with(image=controller.game_image)
+
+
+def test_display_game_image_no_photo(controller, mock_ui):
+    test_image_url = "https://test.com/test_image.jpg"
+
+    with patch.object(controller, "load_game_image") as mock_load_game_image:
+        mock_load_game_image.return_value = None
+
+        controller.display_game_image(test_image_url)
+        assert controller.game_image is None
+        mock_ui.image_label.config.assert_called_once_with(image="")
