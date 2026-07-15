@@ -213,3 +213,20 @@ def test_load_game_image_http_error(controller):
 
         mock_get.assert_called_once_with(test_image_url, timeout=10)
         assert result is None
+
+
+def test_load_game_image_corrupted_image(controller):
+    test_image_url = "https://test.com/test_image.jpg"
+    target_height = 200
+
+    with patch("requests.get") as mock_get:
+        mock_response = MagicMock()
+        mock_response.content = b"not an image"
+        mock_response.raise_for_status.return_value = None
+        mock_get.return_value = mock_response
+
+        result = controller.load_game_image(test_image_url, target_height)
+
+        mock_get.assert_called_once_with(test_image_url, timeout=10)
+
+        assert result is None
