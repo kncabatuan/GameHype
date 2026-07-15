@@ -116,3 +116,24 @@ def test_get_game_details_no_game():
 
     assert controller.get_game_details(test_game_title) is None
     controller.ui.entry_box.config.assert_called_once_with(state="normal")
+
+
+def test_get_game_details_no_image_url():
+    test_game_title = "no image game"
+    test_game_data = {"name": "no image game"}
+
+    mock_ui = MagicMock()
+    controller = app_controller.UIController(mock_ui)
+
+    with patch("api.rawg_service.get_game_details") as mock_get_game_details, patch(
+        "models.game_details.Game") as mock_game_class:
+
+        mock_get_game_details.return_value = test_game_data
+        mock_game_instance = MagicMock()
+        mock_game_instance.raw_data = test_game_data
+        mock_game_class.return_value = mock_game_instance
+
+        controller.get_game_details(test_game_title)
+        controller.ui.root.after.assert_called_once_with(0, controller.ui.image_label.config, {"image": ""})
+
+
