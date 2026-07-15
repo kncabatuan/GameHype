@@ -130,11 +130,10 @@ class UIController:
         try:
             response = requests.get(image_url, timeout=10)
             response.raise_for_status()
+            image_data = io.BytesIO(response.content)
+            img = Image.open(image_data)
         except Exception:
             return None
-
-        image_data = io.BytesIO(response.content)
-        img = Image.open(image_data)
 
         image_width, image_height = img.size
         aspect_ratio = image_width / image_height
