@@ -168,8 +168,6 @@ class UIController:
         self.ui.game_detail_dev.pack(pady=5)
         self.ui.game_detail_metacritic.pack(pady=5)
 
-        self.main_button_control("enable")
-
     def process_game_details(self, game_data: dict) -> dict:
         game_title = game_data.get("name", "Not available")
         if len(game_title) > 50:
@@ -215,12 +213,6 @@ class UIController:
                 self.display = "Wanna check hype? Press go!"
 
         self.ui.status_display.config(text=self.display)
-
-    def main_button_control(self, state: str) -> None:
-        if state == "enable":
-            self.ui.main_button.config(state="normal")
-        elif state == "disable":
-            self.ui.main_button.config(state="disabled")
 
     def remove_game_details(self) -> None:
         self.game_title = None
