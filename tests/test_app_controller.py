@@ -1,13 +1,16 @@
+import io
 import tkinter as tk
 import pytest
 from controllers import app_controller
 from models import game_details
+from PIL import Image
 from unittest.mock import patch, MagicMock
 
 
 @pytest.fixture
 def mock_ui():
     return MagicMock()
+
 
 @pytest.fixture
 def controller(mock_ui):
@@ -100,7 +103,9 @@ def test_get_game_details_success(controller, mock_ui):
         mock_game_class.assert_called_once_with(test_game_data)
         assert controller.game == mock_game_instance
 
-        mock_display_game_image.assert_called_once_with("https://example.com/stardew_valley.jpg")
+        mock_display_game_image.assert_called_once_with(
+            "https://example.com/stardew_valley.jpg"
+        )
         mock_display_game_details.assert_called_once_with(test_game_data)
         mock_ui.entry_box.config.assert_called_once_with(state="normal")
         mock_ui.entry_box.icursor.assert_called_once_with(tk.END)
@@ -132,7 +137,9 @@ def test_get_game_details_no_image_url(controller, mock_ui):
         mock_game_class.return_value = mock_game_instance
 
         controller.get_game_details(test_game_title)
-        mock_ui.root.after.assert_called_once_with(0, mock_ui.image_label.config, {"image": ""})
+        mock_ui.root.after.assert_called_once_with(
+            0, mock_ui.image_label.config, {"image": ""}
+        )
         mock_display_game_details.assert_called_once_with(test_game_data)
         mock_ui.entry_box.config.assert_called_once_with(state="normal")
         mock_ui.entry_box.icursor.assert_called_once_with(tk.END)
@@ -141,7 +148,7 @@ def test_get_game_details_no_image_url(controller, mock_ui):
 
 def test_display_game_image_success(controller, mock_ui):
     test_image_url = "https://test.com/test_image.jpg"
-    
+
     fake_photo_object = MagicMock()
 
     with patch.object(controller, "load_game_image") as mock_load_game_image:
@@ -161,3 +168,32 @@ def test_display_game_image_no_photo(controller, mock_ui):
         controller.display_game_image(test_image_url)
         assert controller.game_image is None
         mock_ui.image_label.config.assert_called_once_with(image="")
+
+
+def test_load_game_image_success(controller):
+    test_image_url = "https://test.com/test_image.jpg"
+    target_height = 200
+
+    img = Image.new("RGB", (100, 100), color="red")
+    img_bytes = io.BytesIO()
+    img.save(img_bytes, format="JPEG")
+
+    with patch("requests.get") as mock_get, patch(
+        "PIL.ImageTk.PhotoImage"
+    ) as mock_photo_image:
+
+        mock_response = MagicMock()
+        mock_response.content = img_bytes.getvalue()
+        mock_response.raise_for_status.return_value = None
+        mock_get.return_value = mock_response
+
+        fake_photo_image = MagicMock()
+        mock_photo_image.return_value = fake_photo_image
+
+        result = controller.load_game_image(test_image_url, target_height)
+
+        mock_get.assert_called_once_with(test_image_url, timeout=10)
+        mock_response.raise_for_status.assert_called_once()
+        mock_photo_image.assert_called_once()
+
+        assert result == fake_photo_image
