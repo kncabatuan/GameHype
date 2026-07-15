@@ -1,6 +1,7 @@
 import io
 import tkinter as tk
 import pytest
+import requests
 from controllers import app_controller
 from models import game_details
 from PIL import Image
@@ -197,3 +198,18 @@ def test_load_game_image_success(controller):
         mock_photo_image.assert_called_once()
 
         assert result == fake_photo_image
+
+
+def test_load_game_image_http_error(controller):
+    test_image_url = "https://test.com/test_image.jpg"
+    target_height = 200
+
+    with patch("requests.get") as mock_get:
+        mock_response = MagicMock()
+        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("404 Client Error")
+        mock_get.return_value = mock_response
+
+        result = controller.load_game_image(test_image_url, target_height)
+
+        mock_get.assert_called_once_with(test_image_url, timeout=10)
+        assert result is None
