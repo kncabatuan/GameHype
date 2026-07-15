@@ -1,13 +1,20 @@
 import tkinter as tk
+import pytest
 from controllers import app_controller
 from models import game_details
 from unittest.mock import patch, MagicMock
 
 
-def test_ui_init():
-    mock_ui = MagicMock()
-    controller = app_controller.UIController(mock_ui)
+@pytest.fixture
+def mock_ui():
+    return MagicMock()
 
+@pytest.fixture
+def controller(mock_ui):
+    return app_controller.UIController(mock_ui)
+
+
+def test_ui_init(controller, mock_ui):
     assert controller.ui == mock_ui
     assert controller.display == "Ready to process"
     assert controller.debounce_counter is None
@@ -16,10 +23,8 @@ def test_ui_init():
     assert controller.game == game_details.Game
 
 
-def test_fetch_title_data_success():
+def test_fetch_title_data_success(controller, mock_ui):
     test_game_title = "stardew valley"
-    mock_ui = MagicMock()
-    controller = app_controller.UIController(mock_ui)
 
     with patch("api.rawg_service.get_game_titles") as mock_get_game_titles:
         mock_get_game_titles.return_value = ["stardew valley 1", "stardew valley 2"]
@@ -32,20 +37,16 @@ def test_fetch_title_data_success():
         )
 
 
-def test_fetch_title_data_fail():
+def test_fetch_title_data_fail(controller, mock_ui):
     test_game_title = "st"
-    mock_ui = MagicMock()
-    controller = app_controller.UIController(mock_ui)
 
     controller.fetch_title_data(test_game_title)
 
     mock_ui.root.after.assert_called_once_with(0, mock_ui.list_box_frame.pack_forget)
 
 
-def test_update_list_box_success():
+def test_update_list_box_success(controller, mock_ui):
     test_titles = ["stardew valley 1", "stardew valley 2"]
-    mock_ui = MagicMock()
-    controller = app_controller.UIController(mock_ui)
 
     controller.update_list_box(test_titles)
 
@@ -59,17 +60,15 @@ def test_update_list_box_success():
     )
 
 
-def test_update_list_box_fail():
+def test_update_list_box_fail(controller, mock_ui):
     test_titles = []
-    mock_ui = MagicMock()
-    controller = app_controller.UIController(mock_ui)
 
     controller.update_list_box(test_titles)
 
     mock_ui.list_box_frame.pack_forget.assert_called_once()
 
 
-def test_get_game_details_success():
+def test_get_game_details_success(controller, mock_ui):
     test_game_title = "stardew valley"
     test_game_data = {
         "name": "Stardew Valley",
@@ -79,8 +78,6 @@ def test_get_game_details_success():
         "metacritic": 89,
         "background_image": "https://example.com/stardew_valley.jpg",
     }
-    mock_ui = MagicMock()
-    controller = app_controller.UIController(mock_ui)
 
     with patch("api.rawg_service.get_game_details") as mock_get_game_details, patch(
         "models.game_details.Game"
@@ -105,28 +102,29 @@ def test_get_game_details_success():
 
         mock_display_game_image.assert_called_once_with("https://example.com/stardew_valley.jpg")
         mock_display_game_details.assert_called_once_with(test_game_data)
+        mock_ui.entry_box.config.assert_called_once_with(state="normal")
+        mock_ui.entry_box.icursor.assert_called_once_with(tk.END)
         mock_status_display_controller.assert_called_once_with("check_hype")
 
 
-def test_get_game_details_no_game():
+def test_get_game_details_no_game(controller, mock_ui):
     test_game_title = ""
-    
-    mock_ui = MagicMock()
-    controller = app_controller.UIController(mock_ui)
 
     assert controller.get_game_details(test_game_title) is None
-    controller.ui.entry_box.config.assert_called_once_with(state="normal")
+    mock_ui.entry_box.config.assert_called_once_with(state="normal")
 
 
-def test_get_game_details_no_image_url():
+def test_get_game_details_no_image_url(controller, mock_ui):
     test_game_title = "no image game"
     test_game_data = {"name": "no image game"}
 
-    mock_ui = MagicMock()
-    controller = app_controller.UIController(mock_ui)
-
     with patch("api.rawg_service.get_game_details") as mock_get_game_details, patch(
-        "models.game_details.Game") as mock_game_class:
+        "models.game_details.Game"
+    ) as mock_game_class, patch.object(
+        controller, "display_game_details"
+    ) as mock_display_game_details, patch.object(
+        controller, "status_display_controller"
+    ) as mock_status_display_controller:
 
         mock_get_game_details.return_value = test_game_data
         mock_game_instance = MagicMock()
@@ -134,6 +132,21 @@ def test_get_game_details_no_image_url():
         mock_game_class.return_value = mock_game_instance
 
         controller.get_game_details(test_game_title)
-        controller.ui.root.after.assert_called_once_with(0, controller.ui.image_label.config, {"image": ""})
+        mock_ui.root.after.assert_called_once_with(0, mock_ui.image_label.config, {"image": ""})
+        mock_display_game_details.assert_called_once_with(test_game_data)
+        mock_ui.entry_box.config.assert_called_once_with(state="normal")
+        mock_ui.entry_box.icursor.assert_called_once_with(tk.END)
+        mock_status_display_controller.assert_called_once_with("check_hype")
 
 
+def test_display_game_image_success(controller, mock_ui):
+    test_image_url = "https://test.com/test_image.jpg"
+    
+    fake_photo_object = MagicMock()
+
+    with patch.object(controller, "load_game_image") as mock_load_game_image:
+        mock_load_game_image.return_value = fake_photo_object
+
+        controller.display_game_image(test_image_url)
+        assert controller.game_image == fake_photo_object
+        mock_ui.image_label.config.assert_called_once_with(image=controller.game_image)
