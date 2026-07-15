@@ -249,3 +249,22 @@ def test_display_game_details_success(controller, mock_ui):
         mock_ui.game_detail_release.config.assert_called_once_with(text=f"Release Date: 2016-02-26")
         mock_ui.game_detail_dev.config.assert_called_once_with(text=f"Developer/Publisher: ConcernedApe")
         mock_ui.game_detail_metacritic.config.assert_called_once_with(text=f"Metacritic Score: 89/100")
+
+
+def test_display_game_details_no_metacritic(controller, mock_ui):
+    test_processed_data = {
+        "game_title": "Stardew Valley",
+        "game_release": "2016-02-26",
+        "game_developer": "ConcernedApe",
+        "game_metacritic": "Not available",
+    }
+
+    with patch.object(controller, "process_game_details") as mock_process_game_details:
+        mock_process_game_details.return_value = test_processed_data
+
+        controller.display_game_details(test_processed_data)
+
+        mock_ui.game_detail_title.config.assert_called_once_with(text=f"Title: Stardew Valley")
+        mock_ui.game_detail_release.config.assert_called_once_with(text=f"Release Date: 2016-02-26")
+        mock_ui.game_detail_dev.config.assert_called_once_with(text=f"Developer/Publisher: ConcernedApe")
+        mock_ui.game_detail_metacritic.config.assert_called_once_with(text=f"Metacritic Score: N/A")
