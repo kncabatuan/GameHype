@@ -104,12 +104,49 @@ def test_get_game_details_success(controller, mock_ui):
     with patch("api.rawg_service.get_game_details") as mock_get_game_details, patch(
         "models.game_details.Game"
     ) as mock_game_class, patch.object(
-        controller, "display_game_image"
-    ) as mock_display_game_image, patch.object(
-        controller, "display_game_details"
-    ) as mock_display_game_details, patch.object(
-        controller, "status_display_controller"
-    ) as mock_status_display_controller:
+        controller, "load_game_image"
+    ) as mock_load_game_image:
+
+        mock_get_game_details.return_value = test_game_data
+        mock_game_instance = MagicMock()
+        mock_game_instance.raw_data = test_game_data
+        mock_game_class.return_value = mock_game_instance
+
+        fake_game_photo_object = MagicMock()
+        mock_load_game_image.return_value = fake_game_photo_object
+
+        controller.get_game_details(test_game_title)
+
+        mock_get_game_details.assert_called_once_with(test_game_title)
+        mock_game_class.assert_called_once_with(test_game_data)
+        assert controller.game == mock_game_instance
+
+        mock_ui.root.after.assert_called_once_with(
+            0,
+            controller.finalize_game_details_on_ui,
+            fake_game_photo_object,
+            mock_game_instance.raw_data,
+        )
+
+
+def test_get_game_details_no_game(controller, mock_ui):
+    test_game_title = ""
+
+    assert controller.get_game_details(test_game_title) is None
+    mock_ui.root.after.assert_called_once_with(
+        0, mock_ui.entry_box.config, state="normal"
+    )
+
+
+def test_get_game_details_no_image_url(controller, mock_ui):
+    test_game_title = "no image game"
+    test_game_data = {"name": "no image game"}
+
+    with patch("api.rawg_service.get_game_details") as mock_get_game_details, patch(
+        "models.game_details.Game"
+    ) as mock_game_class, patch.object(
+        controller, "load_game_image"
+    ) as mock_load_game_image:
 
         mock_get_game_details.return_value = test_game_data
         mock_game_instance = MagicMock()
@@ -121,72 +158,26 @@ def test_get_game_details_success(controller, mock_ui):
         mock_get_game_details.assert_called_once_with(test_game_title)
         mock_game_class.assert_called_once_with(test_game_data)
         assert controller.game == mock_game_instance
-
-        mock_display_game_image.assert_called_once_with(
-            "https://example.com/stardew_valley.jpg"
-        )
-        mock_display_game_details.assert_called_once_with(test_game_data)
-        mock_ui.entry_box.config.assert_called_once_with(state="normal")
-        mock_ui.entry_box.icursor.assert_called_once_with(tk.END)
-        mock_status_display_controller.assert_called_once_with("check_hype")
-
-
-def test_get_game_details_no_game(controller, mock_ui):
-    test_game_title = ""
-
-    assert controller.get_game_details(test_game_title) is None
-    mock_ui.entry_box.config.assert_called_once_with(state="normal")
-
-
-def test_get_game_details_no_image_url(controller, mock_ui):
-    test_game_title = "no image game"
-    test_game_data = {"name": "no image game"}
-
-    with patch("api.rawg_service.get_game_details") as mock_get_game_details, patch(
-        "models.game_details.Game"
-    ) as mock_game_class, patch.object(
-        controller, "display_game_details"
-    ) as mock_display_game_details, patch.object(
-        controller, "status_display_controller"
-    ) as mock_status_display_controller:
-
-        mock_get_game_details.return_value = test_game_data
-        mock_game_instance = MagicMock()
-        mock_game_instance.raw_data = test_game_data
-        mock_game_class.return_value = mock_game_instance
-
-        controller.get_game_details(test_game_title)
+        mock_load_game_image.assert_not_called()
         mock_ui.root.after.assert_called_once_with(
-            0, mock_ui.image_label.config, {"image": ""}
+            0, controller.finalize_game_details_on_ui, None, mock_game_instance.raw_data
         )
-        mock_display_game_details.assert_called_once_with(test_game_data)
-        mock_ui.entry_box.config.assert_called_once_with(state="normal")
-        mock_ui.entry_box.icursor.assert_called_once_with(tk.END)
-        mock_status_display_controller.assert_called_once_with("check_hype")
 
 
 def test_display_game_image_success(controller, mock_ui):
-    test_image_url = "https://test.com/test_image.jpg"
-
     fake_photo_object = MagicMock()
 
-    with patch.object(controller, "load_game_image") as mock_load_game_image:
-        mock_load_game_image.return_value = fake_photo_object
-
-        controller.display_game_image(test_image_url)
-        assert controller.game_image == fake_photo_object
-        mock_ui.image_label.config.assert_called_once_with(image=controller.game_image)
+    controller.display_game_image(fake_photo_object)
+    assert controller.game_image == fake_photo_object
+    mock_ui.image_label.config.assert_called_once_with(image=controller.game_image)
 
 
 def test_display_game_image_no_photo(controller, mock_ui):
-    test_image_url = "https://test.com/test_image.jpg"
+    test_photo = None
 
-    with patch.object(controller, "load_game_image") as mock_load_game_image:
-        mock_load_game_image.return_value = None
-
-        controller.display_game_image(test_image_url)
-        assert controller.game_image is None
-        mock_ui.image_label.config.assert_called_once_with(image="")
+    controller.display_game_image(test_photo)
+    assert controller.game_image is None
+    mock_ui.image_label.config.assert_called_once_with(image="")
 
 
 def test_load_game_image_success(controller):
