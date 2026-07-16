@@ -97,26 +97,26 @@ class UIController:
 
     def get_game_details(self, game: str) -> None:
         if not game:
-            self.ui.entry_box.config(state="normal")
+            self.ui.root.after(0, self.ui.entry_box.config, state="normal")
             return None
 
         self.game = game_details.Game(rawg_service.get_game_details(game))
         image_url = self.game.raw_data.get("background_image", None)
 
+        photo = None
         if image_url:
-            self.display_game_image(image_url)
-        else:
-            self.ui.root.after(0, self.ui.image_label.config, {"image": ""})
+            photo = self.load_game_image(image_url)
+        
+        self.ui.root.after(0, self.finalize_game_details_on_ui, photo, self.game.raw_data)
 
-        self.display_game_details(self.game.raw_data)
-
+    def finalize_game_details_on_ui(self, photo: ImageTk.PhotoImage, game_data: dict) -> None:
+        self.display_game_image(photo)
+        self.display_game_details(game_data)
         self.ui.entry_box.config(state="normal")
         self.status_display_controller("check_hype")
         self.ui.entry_box.icursor(tk.END)
 
-    def display_game_image(self, image_url: str) -> None:
-        photo = self.load_game_image(image_url)
-
+    def display_game_image(self, photo: ImageTk.PhotoImage) -> None:
         if photo:
             self.game_image = photo
             self.ui.image_label.config(image=self.game_image)
