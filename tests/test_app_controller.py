@@ -64,6 +64,24 @@ def test_update_list_box_success(controller, mock_ui):
     )
 
 
+def test_update_list_box_many_titles(controller, mock_ui):
+    test_titles = ["game 1", "game 2", "game 3", "game 4"]
+
+    controller.update_list_box(test_titles)
+
+    mock_ui.list_box.delete.assert_called_once_with(0, tk.END)
+    assert mock_ui.list_box_height == 3
+    mock_ui.list_box.config.assert_called_once_with(height=mock_ui.list_box_height)
+    mock_ui.scroll_bar.pack.assert_called_once_with(side="right", fill="y")
+    mock_ui.list_box.insert.assert_any_call(tk.END, "game 1")
+    mock_ui.list_box.insert.assert_any_call(tk.END, "game 2")
+    mock_ui.list_box.insert.assert_any_call(tk.END, "game 3")
+    mock_ui.list_box.insert.assert_any_call(tk.END, "game 4")
+    mock_ui.list_box_frame.pack.assert_called_once_with(
+        side="top", fill="both", expand="True", padx=10
+    )
+
+
 def test_update_list_box_fail(controller, mock_ui):
     test_titles = []
 
