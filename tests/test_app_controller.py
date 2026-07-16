@@ -206,7 +206,9 @@ def test_load_game_image_http_error(controller):
 
     with patch("requests.get") as mock_get:
         mock_response = MagicMock()
-        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("404 Client Error")
+        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
+            "404 Client Error"
+        )
         mock_get.return_value = mock_response
 
         result = controller.load_game_image(test_image_url, target_height)
@@ -245,10 +247,18 @@ def test_display_game_details_success(controller, mock_ui):
 
         controller.display_game_details(test_processed_data)
 
-        mock_ui.game_detail_title.config.assert_called_once_with(text=f"Title: Stardew Valley")
-        mock_ui.game_detail_release.config.assert_called_once_with(text=f"Release Date: 2016-02-26")
-        mock_ui.game_detail_dev.config.assert_called_once_with(text=f"Developer/Publisher: ConcernedApe")
-        mock_ui.game_detail_metacritic.config.assert_called_once_with(text=f"Metacritic Score: 89/100")
+        mock_ui.game_detail_title.config.assert_called_once_with(
+            text=f"Title: Stardew Valley"
+        )
+        mock_ui.game_detail_release.config.assert_called_once_with(
+            text=f"Release Date: 2016-02-26"
+        )
+        mock_ui.game_detail_dev.config.assert_called_once_with(
+            text=f"Developer/Publisher: ConcernedApe"
+        )
+        mock_ui.game_detail_metacritic.config.assert_called_once_with(
+            text=f"Metacritic Score: 89/100"
+        )
 
 
 def test_display_game_details_no_metacritic(controller, mock_ui):
@@ -264,7 +274,15 @@ def test_display_game_details_no_metacritic(controller, mock_ui):
 
         controller.display_game_details(test_processed_data)
 
-        mock_ui.game_detail_title.config.assert_called_once_with(text=f"Title: Stardew Valley")
-        mock_ui.game_detail_release.config.assert_called_once_with(text=f"Release Date: 2016-02-26")
-        mock_ui.game_detail_dev.config.assert_called_once_with(text=f"Developer/Publisher: ConcernedApe")
-        mock_ui.game_detail_metacritic.config.assert_called_once_with(text=f"Metacritic Score: N/A")
+        mock_ui.game_detail_title.config.assert_called_once_with(
+            text=f"Title: Stardew Valley"
+        )
+        mock_ui.game_detail_release.config.assert_called_once_with(
+            text=f"Release Date: 2016-02-26"
+        )
+        mock_ui.game_detail_dev.config.assert_called_once_with(
+            text=f"Developer/Publisher: ConcernedApe"
+        )
+        mock_ui.game_detail_metacritic.config.assert_called_once_with(
+            text=f"Metacritic Score: N/A"
+        )
