@@ -286,3 +286,55 @@ def test_display_game_details_no_metacritic(controller, mock_ui):
         mock_ui.game_detail_metacritic.config.assert_called_once_with(
             text=f"Metacritic Score: N/A"
         )
+
+
+def test_process_game_details_success(controller):
+    test_game_data = {
+        "name": "Stardew Valley",
+        "released": "2016-02-26",
+        "developers": [{"name": "ConcernedApe"}],
+        "metacritic": 89,
+    }
+
+    exepcted_processed_data = {
+        "game_title": "Stardew Valley",
+        "game_release": "2016-02-26",
+        "game_developer": "ConcernedApe",
+        "game_metacritic": 89,
+    }
+
+    assert controller.process_game_details(test_game_data) == exepcted_processed_data
+
+
+def test_process_game_details_missing_fields(controller):
+    test_game_data = {
+        "name": "Stardew Valley",
+        "developers": [],
+    }
+
+    expected_processed_data = {
+        "game_title": "Stardew Valley",
+        "game_release": "Not available",
+        "game_developer": "Not available",
+        "game_metacritic": "Not available",
+    }
+
+    assert controller.process_game_details(test_game_data) == expected_processed_data
+
+
+def test_process_game_details_long_fields(controller):
+    test_game_data = {
+        "name": "A" * 60,
+        "released": "2016-02-26",
+        "developers": [{"name": "B" * 60}],
+        "metacritic": 89,
+    }
+
+    expected_processed_data = {
+        "game_title": "A" * 50 + "...",
+        "game_release": "2016-02-26",
+        "game_developer": "B" * 50 + "...",
+        "game_metacritic": 89,
+    }
+
+    assert controller.process_game_details(test_game_data) == expected_processed_data
