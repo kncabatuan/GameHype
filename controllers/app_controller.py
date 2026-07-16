@@ -106,10 +106,14 @@ class UIController:
         photo = None
         if image_url:
             photo = self.load_game_image(image_url)
-        
-        self.ui.root.after(0, self.finalize_game_details_on_ui, photo, self.game.raw_data)
 
-    def finalize_game_details_on_ui(self, photo: ImageTk.PhotoImage, game_data: dict) -> None:
+        self.ui.root.after(
+            0, self.finalize_game_details_on_ui, photo, self.game.raw_data
+        )
+
+    def finalize_game_details_on_ui(
+        self, photo: ImageTk.PhotoImage, game_data: dict
+    ) -> None:
         self.display_game_image(photo)
         self.display_game_details(game_data)
         self.ui.entry_box.config(state="normal")
@@ -175,7 +179,9 @@ class UIController:
         developer_names = [
             dev.get("name", "Not available") for dev in game_data.get("developers", [])
         ]
-        game_developer = ", ".join(developer_names) if developer_names else "Not available"
+        game_developer = (
+            ", ".join(developer_names) if developer_names else "Not available"
+        )
         if len(game_developer) > 50:
             game_developer = game_developer[:50] + "..."
 
