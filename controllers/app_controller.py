@@ -175,7 +175,7 @@ class UIController:
         developer_names = [
             dev.get("name", "Not available") for dev in game_data.get("developers", [])
         ]
-        game_developer = ", ".join(developer_names) if developer_names else "N/A"
+        game_developer = ", ".join(developer_names) if developer_names else "Not available"
         if len(game_developer) > 50:
             game_developer = game_developer[:50] + "..."
 
