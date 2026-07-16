@@ -180,7 +180,9 @@ class UIController:
             game_developer = game_developer[:50] + "..."
 
         game_release = game_data.get("released", "Not available")
-        game_metacritic = game_data.get("metacritic", "Not available")
+        game_metacritic = game_data.get("metacritic")
+        if game_metacritic is None:
+            game_metacritic = "Not available"
 
         processed_data = {
             "game_title": game_title,
