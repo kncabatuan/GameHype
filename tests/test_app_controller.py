@@ -465,7 +465,7 @@ def test_finalize_game_details_on_ui_success(controller, mock_ui):
         "game_metacritic": 89,
     }
 
-    with patch("PIL.ImageTk.PhotoImage") as mock_photo, patch.object(
+    with patch.object(
         controller, "display_game_image"
     ) as mock_display_game_image, patch.object(
         controller, "display_game_details"
@@ -474,7 +474,6 @@ def test_finalize_game_details_on_ui_success(controller, mock_ui):
     ) as mock_status_display_controller:
 
         fake_photo = MagicMock()
-        mock_photo.return_value = fake_photo
 
         controller.finalize_game_details_on_ui(fake_photo, test_game_data)
 
@@ -483,3 +482,5 @@ def test_finalize_game_details_on_ui_success(controller, mock_ui):
         mock_ui.entry_box.config.assert_called_once_with(state="normal")
         mock_status_display_controller.assert_called_once_with("check_hype")
         mock_ui.entry_box.icursor(tk.END)
+
+
