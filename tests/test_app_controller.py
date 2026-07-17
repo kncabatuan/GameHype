@@ -455,3 +455,31 @@ def test_on_listbox_click(controller, mock_ui):
         mock_thread.assert_called_once_with(target=controller.get_game_details, args=(test_selected_game,))
         assert mock_thread.return_value.daemon == True
         mock_thread.return_value.start.assert_called_once()
+
+
+def test_finalize_game_details_on_ui_success(controller, mock_ui):
+    test_game_data = {
+        "game_title": "Stardew Valley",
+        "game_release": "2016-02-26",
+        "game_developer": "ConcernedApe",
+        "game_metacritic": 89,
+    }
+
+    with patch("PIL.ImageTk.PhotoImage") as mock_photo, patch.object(
+        controller, "display_game_image"
+    ) as mock_display_game_image, patch.object(
+        controller, "display_game_details"
+    ) as mock_display_game_details, patch.object(
+        controller, "status_display_controller"
+    ) as mock_status_display_controller:
+
+        fake_photo = MagicMock()
+        mock_photo.return_value = fake_photo
+
+        controller.finalize_game_details_on_ui(fake_photo, test_game_data)
+
+        mock_display_game_image.assert_called_once_with(fake_photo)
+        mock_display_game_details.assert_called_once_with(test_game_data)
+        mock_ui.entry_box.config.assert_called_once_with(state="normal")
+        mock_status_display_controller.assert_called_once_with("check_hype")
+        mock_ui.entry_box.icursor(tk.END)
