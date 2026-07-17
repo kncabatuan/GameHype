@@ -516,3 +516,13 @@ def test_remove_game_details(controller, mock_ui):
         mock_ui.game_detail_dev.pack_forget.assert_called_once()
         mock_ui.game_detail_metacritic.pack_forget.assert_called_once()
         mock_ui.image_label.config.assert_called_once_with(image="")
+
+
+def test_on_mouse_wheel(controller, mock_ui):
+    test_delta = 120
+    fake_event = MagicMock()
+    fake_event.delta = test_delta
+
+    controller.on_mouse_wheel(fake_event)
+
+    mock_ui.list_box.yview_scroll.assert_called_once_with(-1, "units")
