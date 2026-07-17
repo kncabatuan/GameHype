@@ -390,3 +390,17 @@ def test_start_get_titles_thread_success(controller, mock_ui):
         mock_thread.assert_called_once_with(target=controller.fetch_title_data, args=(test_game_title,))
         assert mock_thread.return_value.daemon == True
         mock_thread.return_value.start.assert_called_once()
+
+
+def test_start_get_titles_thread_no_title(controller, mock_ui):
+    mock_ui.entry_box.get.return_value = ""
+
+    with patch.object(controller, "remove_game_details") as mock_remove_game_details, patch.object(
+        controller, "status_display_controller"
+    ) as mock_status_display_controller:
+        controller.start_get_titles_thread()
+
+        mock_ui.entry_box.get.assert_called_once()
+        mock_ui.list_box_frame.pack_forget.assert_called_once()
+        mock_remove_game_details.assert_called_once()
+        mock_status_display_controller.assert_called_once_with("ready")
