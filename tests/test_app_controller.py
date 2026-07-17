@@ -60,7 +60,7 @@ def test_update_list_box_success(controller, mock_ui):
     mock_ui.list_box.insert.assert_any_call(tk.END, "stardew valley 1")
     mock_ui.list_box.insert.assert_any_call(tk.END, "stardew valley 2")
     mock_ui.list_box_frame.pack.assert_called_once_with(
-        side="top", fill="both", expand="True", padx=10
+        side="top", fill="both", expand=True, padx=10
     )
 
 
@@ -78,7 +78,7 @@ def test_update_list_box_many_titles(controller, mock_ui):
     mock_ui.list_box.insert.assert_any_call(tk.END, "game 3")
     mock_ui.list_box.insert.assert_any_call(tk.END, "game 4")
     mock_ui.list_box_frame.pack.assert_called_once_with(
-        side="top", fill="both", expand="True", padx=10
+        side="top", fill="both", expand=True, padx=10
     )
 
 

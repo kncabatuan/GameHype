@@ -62,7 +62,7 @@ class UIController:
             for title in results:
                 self.ui.list_box.insert(tk.END, title)
 
-            self.ui.list_box_frame.pack(side="top", fill="both", expand="True", padx=10)
+            self.ui.list_box_frame.pack(side="top", fill="both", expand=True, padx=10)
 
         else:
             self.ui.list_box_frame.pack_forget()
