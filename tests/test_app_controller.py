@@ -420,3 +420,38 @@ def test_on_list_box_hover_success(controller, mock_ui):
     mock_ui.list_box.selection_set.assert_called_once_with(test_index)
     mock_ui.list_box.activate.assert_called_once_with(test_index)
 
+
+def test_on_listbox_click(controller, mock_ui):
+    test_index = 0
+    test_list_box_size = 2
+    test_selected_game = "test_game"
+
+    fake_event = MagicMock()
+    fake_event.y = 50
+
+    mock_ui.list_box.nearest.return_value = test_index
+    mock_ui.list_box.size.return_value = test_list_box_size
+    mock_ui.list_box.get.return_value = test_selected_game
+
+    with patch.object(
+        controller, "status_display_controller"
+        ) as mock_status_display_controller, patch(
+            "threading.Thread"
+        ) as mock_thread:
+
+        mock_thread_instance = MagicMock()
+        mock_thread.return_value = mock_thread_instance
+
+        controller.on_listbox_click(fake_event)
+
+        mock_ui.list_box.nearest.assert_called_once_with(50)
+        mock_ui.list_box.get.assert_called_once_with(test_index)
+        mock_status_display_controller.assert_called_once_with("fetching")
+        mock_ui.entry_box.delete.assert_called_once_with(0, tk.END)
+        mock_ui.entry_box.insert.assert_called_once_with(0, test_selected_game)
+        mock_ui.list_box_frame.pack_forget.assert_called_once()
+        mock_ui.entry_box.config.assert_called_once_with(state="disabled")
+
+        mock_thread.assert_called_once_with(target=controller.get_game_details, args=(test_selected_game,))
+        assert mock_thread.return_value.daemon == True
+        mock_thread.return_value.start.assert_called_once()
