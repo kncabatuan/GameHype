@@ -27,6 +27,63 @@ def test_ui_init(controller, mock_ui):
     assert controller.game == game_details.Game
 
 
+def test_on_key_release_timer_on(controller, mock_ui):
+    controller.debounce_counter = "timer_id_1"
+    mock_ui.root.after.return_value = "timer_id_2"
+
+    controller.on_key_release(MagicMock())
+
+    mock_ui.root.after_cancel.assert_called_once_with("timer_id_1")
+    mock_ui.root.after.assert_called_once_with(300, controller.start_get_titles_thread)
+    assert controller.debounce_counter == "timer_id_2"
+
+
+def test_on_key_release_no_timer_yet(controller, mock_ui):
+    controller.debounce_counter = None
+    mock_ui.root.after.return_value = "timer_id_2"
+
+    controller.on_key_release(MagicMock())
+
+    mock_ui.root.after_cancel.assert_not_called()
+    mock_ui.root.after.assert_called_once_with(300, controller.start_get_titles_thread)
+    assert controller.debounce_counter == "timer_id_2"
+
+
+def test_start_get_titles_thread_success(controller, mock_ui):
+    test_game_title = "stardew valley"
+
+    mock_ui.entry_box.get.return_value = test_game_title
+
+    with patch("threading.Thread") as mock_thread:
+        mock_thread_instance = MagicMock()
+        mock_thread.return_value = mock_thread_instance
+
+        controller.start_get_titles_thread()
+
+        mock_ui.entry_box.get.assert_called_once()
+        mock_thread.assert_called_once_with(
+            target=controller.fetch_title_data, args=(test_game_title,)
+        )
+        assert mock_thread.return_value.daemon == True
+        mock_thread.return_value.start.assert_called_once()
+
+
+def test_start_get_titles_thread_no_title(controller, mock_ui):
+    mock_ui.entry_box.get.return_value = ""
+
+    with patch.object(
+        controller, "remove_game_details"
+    ) as mock_remove_game_details, patch.object(
+        controller, "status_display_controller"
+    ) as mock_status_display_controller:
+        controller.start_get_titles_thread()
+
+        mock_ui.entry_box.get.assert_called_once()
+        mock_ui.list_box_frame.pack_forget.assert_called_once()
+        mock_remove_game_details.assert_called_once()
+        mock_status_display_controller.assert_called_once_with("ready")
+
+
 def test_fetch_title_data_success(controller, mock_ui):
     test_game_title = "stardew valley"
 
@@ -88,6 +145,57 @@ def test_update_list_box_fail(controller, mock_ui):
     controller.update_list_box(test_titles)
 
     mock_ui.list_box_frame.pack_forget.assert_called_once()
+
+
+def test_on_list_box_hover_success(controller, mock_ui):
+    test_index = 0
+    fake_event = MagicMock()
+    fake_event.y = 50
+
+    mock_ui.list_box.nearest.return_value = test_index
+
+    controller.on_listbox_hover(fake_event)
+
+    mock_ui.list_box.nearest.assert_called_once_with(50)
+    mock_ui.list_box.selection_clear.assert_called_once_with(0, tk.END)
+    mock_ui.list_box.selection_set.assert_called_once_with(test_index)
+    mock_ui.list_box.activate.assert_called_once_with(test_index)
+
+
+def test_on_listbox_click(controller, mock_ui):
+    test_index = 0
+    test_list_box_size = 2
+    test_selected_game = "test_game"
+
+    fake_event = MagicMock()
+    fake_event.y = 50
+
+    mock_ui.list_box.nearest.return_value = test_index
+    mock_ui.list_box.size.return_value = test_list_box_size
+    mock_ui.list_box.get.return_value = test_selected_game
+
+    with patch.object(
+        controller, "status_display_controller"
+    ) as mock_status_display_controller, patch("threading.Thread") as mock_thread:
+
+        mock_thread_instance = MagicMock()
+        mock_thread.return_value = mock_thread_instance
+
+        controller.on_listbox_click(fake_event)
+
+        mock_ui.list_box.nearest.assert_called_once_with(50)
+        mock_ui.list_box.get.assert_called_once_with(test_index)
+        mock_status_display_controller.assert_called_once_with("fetching")
+        mock_ui.entry_box.delete.assert_called_once_with(0, tk.END)
+        mock_ui.entry_box.insert.assert_called_once_with(0, test_selected_game)
+        mock_ui.list_box_frame.pack_forget.assert_called_once()
+        mock_ui.entry_box.config.assert_called_once_with(state="disabled")
+
+        mock_thread.assert_called_once_with(
+            target=controller.get_game_details, args=(test_selected_game,)
+        )
+        assert mock_thread.return_value.daemon == True
+        mock_thread.return_value.start.assert_called_once()
 
 
 def test_get_game_details_success(controller, mock_ui):
@@ -162,6 +270,33 @@ def test_get_game_details_no_image_url(controller, mock_ui):
         mock_ui.root.after.assert_called_once_with(
             0, controller.finalize_game_details_on_ui, None, mock_game_instance.raw_data
         )
+
+
+def test_finalize_game_details_on_ui_success(controller, mock_ui):
+    test_game_data = {
+        "game_title": "Stardew Valley",
+        "game_release": "2016-02-26",
+        "game_developer": "ConcernedApe",
+        "game_metacritic": 89,
+    }
+
+    with patch.object(
+        controller, "display_game_image"
+    ) as mock_display_game_image, patch.object(
+        controller, "display_game_details"
+    ) as mock_display_game_details, patch.object(
+        controller, "status_display_controller"
+    ) as mock_status_display_controller:
+
+        fake_photo = MagicMock()
+
+        controller.finalize_game_details_on_ui(fake_photo, test_game_data)
+
+        mock_display_game_image.assert_called_once_with(fake_photo)
+        mock_display_game_details.assert_called_once_with(test_game_data)
+        mock_ui.entry_box.config.assert_called_once_with(state="normal")
+        mock_status_display_controller.assert_called_once_with("check_hype")
+        mock_ui.entry_box.icursor.assert_called_once_with(tk.END)
 
 
 def test_display_game_image_success(controller, mock_ui):
@@ -269,7 +404,7 @@ def test_display_game_details_success(controller, mock_ui):
     mock_ui.game_detail_title.pack.assert_called_once_with(pady=(10, 5))
     mock_ui.game_detail_release.pack.assert_called_once_with(pady=5)
     mock_ui.game_detail_dev.pack.assert_called_once_with(pady=5)
-    mock_ui.game_detail_metacritic.pack.assert_called_once_with(pady=5) 
+    mock_ui.game_detail_metacritic.pack.assert_called_once_with(pady=5)
 
 
 def test_display_game_details_no_metacritic(controller, mock_ui):
@@ -353,171 +488,6 @@ def test_process_game_details_long_fields(controller):
     assert controller.process_game_details(test_game_data) == expected_processed_data
 
 
-def test_on_key_release_timer_on(controller, mock_ui):
-    controller.debounce_counter = "timer_id_1"
-    mock_ui.root.after.return_value = "timer_id_2"
-
-    controller.on_key_release(MagicMock())
-
-    mock_ui.root.after_cancel.assert_called_once_with("timer_id_1")
-    mock_ui.root.after.assert_called_once_with(300, controller.start_get_titles_thread)
-    assert controller.debounce_counter == "timer_id_2"
-
-
-def test_on_key_release_no_timer_yet(controller, mock_ui):
-    controller.debounce_counter = None
-    mock_ui.root.after.return_value = "timer_id_2"
-
-    controller.on_key_release(MagicMock())
-
-    mock_ui.root.after_cancel.assert_not_called()
-    mock_ui.root.after.assert_called_once_with(300, controller.start_get_titles_thread)
-    assert controller.debounce_counter == "timer_id_2"
-
-
-def test_start_get_titles_thread_success(controller, mock_ui):
-    test_game_title = "stardew valley"
-
-    mock_ui.entry_box.get.return_value = test_game_title
-
-    with patch("threading.Thread") as mock_thread:
-        mock_thread_instance = MagicMock()
-        mock_thread.return_value = mock_thread_instance
-
-        controller.start_get_titles_thread()
-
-        mock_ui.entry_box.get.assert_called_once()
-        mock_thread.assert_called_once_with(target=controller.fetch_title_data, args=(test_game_title,))
-        assert mock_thread.return_value.daemon == True
-        mock_thread.return_value.start.assert_called_once()
-
-
-def test_start_get_titles_thread_no_title(controller, mock_ui):
-    mock_ui.entry_box.get.return_value = ""
-
-    with patch.object(controller, "remove_game_details") as mock_remove_game_details, patch.object(
-        controller, "status_display_controller"
-    ) as mock_status_display_controller:
-        controller.start_get_titles_thread()
-
-        mock_ui.entry_box.get.assert_called_once()
-        mock_ui.list_box_frame.pack_forget.assert_called_once()
-        mock_remove_game_details.assert_called_once()
-        mock_status_display_controller.assert_called_once_with("ready")
-
-
-def test_on_list_box_hover_success(controller, mock_ui):
-    test_index = 0
-    fake_event = MagicMock()
-    fake_event.y = 50
-
-    mock_ui.list_box.nearest.return_value = test_index
-
-    controller.on_listbox_hover(fake_event)
-
-    mock_ui.list_box.nearest.assert_called_once_with(50)
-    mock_ui.list_box.selection_clear.assert_called_once_with(0, tk.END)
-    mock_ui.list_box.selection_set.assert_called_once_with(test_index)
-    mock_ui.list_box.activate.assert_called_once_with(test_index)
-
-
-def test_on_listbox_click(controller, mock_ui):
-    test_index = 0
-    test_list_box_size = 2
-    test_selected_game = "test_game"
-
-    fake_event = MagicMock()
-    fake_event.y = 50
-
-    mock_ui.list_box.nearest.return_value = test_index
-    mock_ui.list_box.size.return_value = test_list_box_size
-    mock_ui.list_box.get.return_value = test_selected_game
-
-    with patch.object(
-        controller, "status_display_controller"
-        ) as mock_status_display_controller, patch(
-            "threading.Thread"
-        ) as mock_thread:
-
-        mock_thread_instance = MagicMock()
-        mock_thread.return_value = mock_thread_instance
-
-        controller.on_listbox_click(fake_event)
-
-        mock_ui.list_box.nearest.assert_called_once_with(50)
-        mock_ui.list_box.get.assert_called_once_with(test_index)
-        mock_status_display_controller.assert_called_once_with("fetching")
-        mock_ui.entry_box.delete.assert_called_once_with(0, tk.END)
-        mock_ui.entry_box.insert.assert_called_once_with(0, test_selected_game)
-        mock_ui.list_box_frame.pack_forget.assert_called_once()
-        mock_ui.entry_box.config.assert_called_once_with(state="disabled")
-
-        mock_thread.assert_called_once_with(target=controller.get_game_details, args=(test_selected_game,))
-        assert mock_thread.return_value.daemon == True
-        mock_thread.return_value.start.assert_called_once()
-
-
-def test_finalize_game_details_on_ui_success(controller, mock_ui):
-    test_game_data = {
-        "game_title": "Stardew Valley",
-        "game_release": "2016-02-26",
-        "game_developer": "ConcernedApe",
-        "game_metacritic": 89,
-    }
-
-    with patch.object(
-        controller, "display_game_image"
-    ) as mock_display_game_image, patch.object(
-        controller, "display_game_details"
-    ) as mock_display_game_details, patch.object(
-        controller, "status_display_controller"
-    ) as mock_status_display_controller:
-
-        fake_photo = MagicMock()
-
-        controller.finalize_game_details_on_ui(fake_photo, test_game_data)
-
-        mock_display_game_image.assert_called_once_with(fake_photo)
-        mock_display_game_details.assert_called_once_with(test_game_data)
-        mock_ui.entry_box.config.assert_called_once_with(state="normal")
-        mock_status_display_controller.assert_called_once_with("check_hype")
-        mock_ui.entry_box.icursor.assert_called_once_with(tk.END)
-
-
-@pytest.mark.parametrize("status_key, expected_display", [
-    ("ready", "Ready to process"),
-    ("fetching", "Fetching data..."),
-    ("check_hype", "Wanna check hype? Press go!")
-])
-def test_status_display_controller(controller, mock_ui, status_key, expected_display):
-    controller.status_display_controller(status_key)
-    assert controller.display == expected_display
-    mock_ui.status_display.config.assert_called_once_with(text=controller.display)
-
-
-def test_remove_game_details(controller, mock_ui):
-    test_set_title = "stardew valley"
-    controller.game_title = test_set_title
-    controller.game_image = MagicMock()
-
-    with patch("models.game_details.Game") as mock_game:
-        mock_game_instance = MagicMock()
-        mock_game.return_value = mock_game_instance
-
-        controller.game = mock_game.return_value
-
-        controller.remove_game_details()
-
-        assert controller.game_title is None
-        assert controller.game_image is None
-        assert controller.game is None
-        mock_ui.game_detail_title.pack_forget.assert_called_once()
-        mock_ui.game_detail_release.pack_forget.assert_called_once()
-        mock_ui.game_detail_dev.pack_forget.assert_called_once()
-        mock_ui.game_detail_metacritic.pack_forget.assert_called_once()
-        mock_ui.image_label.config.assert_called_once_with(image="")
-
-
 def test_on_mouse_wheel(controller, mock_ui):
     test_delta = 120
     fake_event = MagicMock()
@@ -547,5 +517,43 @@ def test_on_go_click_fail(controller, mock_ui):
         controller.on_go_click()
 
         mock_ui.entry_box.get.assert_called_once()
-        mock_show_error.assert_called_once_with("No input", "There is no input. Please enter a valid game title")
+        mock_show_error.assert_called_once_with(
+            "No input", "There is no input. Please enter a valid game title"
+        )
 
+
+@pytest.mark.parametrize(
+    "status_key, expected_display",
+    [
+        ("ready", "Ready to process"),
+        ("fetching", "Fetching data..."),
+        ("check_hype", "Wanna check hype? Press go!"),
+    ],
+)
+def test_status_display_controller(controller, mock_ui, status_key, expected_display):
+    controller.status_display_controller(status_key)
+    assert controller.display == expected_display
+    mock_ui.status_display.config.assert_called_once_with(text=controller.display)
+
+
+def test_remove_game_details(controller, mock_ui):
+    test_set_title = "stardew valley"
+    controller.game_title = test_set_title
+    controller.game_image = MagicMock()
+
+    with patch("models.game_details.Game") as mock_game:
+        mock_game_instance = MagicMock()
+        mock_game.return_value = mock_game_instance
+
+        controller.game = mock_game.return_value
+
+        controller.remove_game_details()
+
+        assert controller.game_title is None
+        assert controller.game_image is None
+        assert controller.game is None
+        mock_ui.game_detail_title.pack_forget.assert_called_once()
+        mock_ui.game_detail_release.pack_forget.assert_called_once()
+        mock_ui.game_detail_dev.pack_forget.assert_called_once()
+        mock_ui.game_detail_metacritic.pack_forget.assert_called_once()
+        mock_ui.image_label.config.assert_called_once_with(image="")
