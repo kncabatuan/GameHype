@@ -409,13 +409,13 @@ def test_start_get_titles_thread_no_title(controller, mock_ui):
 def test_on_list_box_hover_success(controller, mock_ui):
     test_index = 0
     fake_event = MagicMock()
-    fake_event.y = 1
+    fake_event.y = 50
 
     mock_ui.list_box.nearest.return_value = test_index
 
     controller.on_listbox_hover(fake_event)
 
-    mock_ui.list_box.nearest.assert_called_once_with(1)
+    mock_ui.list_box.nearest.assert_called_once_with(50)
     mock_ui.list_box.selection_clear.assert_called_once_with(0, tk.END)
     mock_ui.list_box.selection_set.assert_called_once_with(test_index)
     mock_ui.list_box.activate.assert_called_once_with(test_index)
