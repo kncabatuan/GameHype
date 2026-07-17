@@ -481,6 +481,6 @@ def test_finalize_game_details_on_ui_success(controller, mock_ui):
         mock_display_game_details.assert_called_once_with(test_game_data)
         mock_ui.entry_box.config.assert_called_once_with(state="normal")
         mock_status_display_controller.assert_called_once_with("check_hype")
-        mock_ui.entry_box.icursor(tk.END)
+        mock_ui.entry_box.icursor.assert_called_once_with(tk.END)
 
 
