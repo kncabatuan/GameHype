@@ -373,3 +373,20 @@ def test_on_key_release_no_timer_yet(controller, mock_ui):
     mock_ui.root.after_cancel.assert_not_called()
     mock_ui.root.after.assert_called_once_with(300, controller.start_get_titles_thread)
     assert controller.debounce_counter == "timer_id_2"
+
+
+def test_start_get_titles_thread_success(controller, mock_ui):
+    test_game_title = "stardew valley"
+
+    mock_ui.entry_box.get.return_value = test_game_title
+
+    with patch("threading.Thread") as mock_thread:
+        mock_thread_instance = MagicMock()
+        mock_thread.return_value = mock_thread_instance
+
+        controller.start_get_titles_thread()
+
+        mock_ui.entry_box.get.assert_called_once()
+        mock_thread.assert_called_once_with(target=controller.fetch_title_data, args=(test_game_title,))
+        assert mock_thread.return_value.daemon == True
+        mock_thread.return_value.start.assert_called_once()
