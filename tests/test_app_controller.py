@@ -526,3 +526,13 @@ def test_on_mouse_wheel(controller, mock_ui):
     controller.on_mouse_wheel(fake_event)
 
     mock_ui.list_box.yview_scroll.assert_called_once_with(-1, "units")
+
+
+def test_on_go_click_success(controller, mock_ui):
+    test_title = "stardew valley"
+    controller.ui.entry_box.get.return_value = test_title
+
+    controller.on_go_click()
+
+    mock_ui.entry_box.get.assert_called_once()
+    assert controller.game_title == test_title
