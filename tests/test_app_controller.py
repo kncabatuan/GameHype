@@ -493,3 +493,26 @@ def test_status_display_controller(controller, mock_ui, status_key, expected_dis
     controller.status_display_controller(status_key)
     assert controller.display == expected_display
     mock_ui.status_display.config.assert_called_once_with(text=controller.display)
+
+
+def test_remove_game_details(controller, mock_ui):
+    test_set_title = "stardew valley"
+    controller.game_title = test_set_title
+    controller.game_image = MagicMock()
+
+    with patch("models.game_details.Game") as mock_game:
+        mock_game_instance = MagicMock()
+        mock_game.return_value = mock_game_instance
+
+        controller.game = mock_game.return_value
+
+        controller.remove_game_details()
+
+        assert controller.game_title is None
+        assert controller.game_image is None
+        assert controller.game is None
+        mock_ui.game_detail_title.pack_forget.assert_called_once()
+        mock_ui.game_detail_release.pack_forget.assert_called_once()
+        mock_ui.game_detail_dev.pack_forget.assert_called_once()
+        mock_ui.game_detail_metacritic.pack_forget.assert_called_once()
+        mock_ui.image_label.config.assert_called_once_with(image="")
