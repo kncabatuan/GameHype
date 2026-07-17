@@ -523,9 +523,10 @@ def test_on_mouse_wheel(controller, mock_ui):
     fake_event = MagicMock()
     fake_event.delta = test_delta
 
-    controller.on_mouse_wheel(fake_event)
+    result = controller.on_mouse_wheel(fake_event)
 
     mock_ui.list_box.yview_scroll.assert_called_once_with(-1, "units")
+    assert result == "break"
 
 
 def test_on_go_click_success(controller, mock_ui):
@@ -545,6 +546,6 @@ def test_on_go_click_fail(controller, mock_ui):
     with patch("tkinter.messagebox.showerror") as mock_show_error:
         controller.on_go_click()
 
-        mock_ui.entry_box.get.assert_called_once
+        mock_ui.entry_box.get.assert_called_once()
         mock_show_error.assert_called_once_with("No input", "There is no input. Please enter a valid game title")
 
