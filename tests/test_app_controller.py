@@ -530,9 +530,21 @@ def test_on_mouse_wheel(controller, mock_ui):
 
 def test_on_go_click_success(controller, mock_ui):
     test_title = "stardew valley"
-    controller.ui.entry_box.get.return_value = test_title
+    mock_ui.entry_box.get.return_value = test_title
 
     controller.on_go_click()
 
     mock_ui.entry_box.get.assert_called_once()
     assert controller.game_title == test_title
+
+
+def test_on_go_click_fail(controller, mock_ui):
+    test_title = ""
+    mock_ui.entry_box.get.return_value = test_title
+
+    with patch("tkinter.messagebox.showerror") as mock_show_error:
+        controller.on_go_click()
+
+        mock_ui.entry_box.get.assert_called_once
+        mock_show_error.assert_called_once_with("No input", "There is no input. Please enter a valid game title")
+
