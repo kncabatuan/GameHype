@@ -484,3 +484,12 @@ def test_finalize_game_details_on_ui_success(controller, mock_ui):
         mock_ui.entry_box.icursor.assert_called_once_with(tk.END)
 
 
+@pytest.mark.parametrize("status_key, expected_display", [
+    ("ready", "Ready to process"),
+    ("fetching", "Fetching data..."),
+    ("check_hype", "Wanna check hype? Press go!")
+])
+def test_status_display_controller(controller, mock_ui, status_key, expected_display):
+    controller.status_display_controller(status_key)
+    assert controller.display == expected_display
+    mock_ui.status_display.config.assert_called_once_with(text=controller.display)
