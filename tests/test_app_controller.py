@@ -362,3 +362,14 @@ def test_on_key_release_timer_on(controller, mock_ui):
     mock_ui.root.after_cancel.assert_called_once_with("timer_id_1")
     mock_ui.root.after.assert_called_once_with(300, controller.start_get_titles_thread)
     assert controller.debounce_counter == "timer_id_2"
+
+
+def test_on_key_release_no_timer_yet(controller, mock_ui):
+    controller.debounce_counter = None
+    mock_ui.root.after.return_value = "timer_id_2"
+
+    controller.on_key_release(MagicMock())
+
+    mock_ui.root.after_cancel.assert_not_called()
+    mock_ui.root.after.assert_called_once_with(300, controller.start_get_titles_thread)
+    assert controller.debounce_counter == "timer_id_2"
