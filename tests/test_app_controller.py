@@ -351,3 +351,14 @@ def test_process_game_details_long_fields(controller):
     }
 
     assert controller.process_game_details(test_game_data) == expected_processed_data
+
+
+def test_on_key_release_timer_on(controller, mock_ui):
+    controller.debounce_counter = "timer_id_1"
+    mock_ui.root.after.return_value = "timer_id_2"
+
+    controller.on_key_release(MagicMock())
+
+    mock_ui.root.after_cancel.assert_called_once_with("timer_id_1")
+    mock_ui.root.after.assert_called_once_with(300, controller.start_get_titles_thread)
+    assert controller.debounce_counter == "timer_id_2"
