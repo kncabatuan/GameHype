@@ -266,6 +266,11 @@ def test_display_game_details_success(controller, mock_ui):
         text=f"Metacritic Score: 89/100"
     )
 
+    mock_ui.game_detail_title.pack.assert_called_once_with(pady=(10, 5))
+    mock_ui.game_detail_release.pack.assert_called_once_with(pady=5)
+    mock_ui.game_detail_dev.pack.assert_called_once_with(pady=5)
+    mock_ui.game_detail_metacritic.pack.assert_called_once_with(pady=5) 
+
 
 def test_display_game_details_no_metacritic(controller, mock_ui):
     test_raw_data = {
@@ -289,6 +294,11 @@ def test_display_game_details_no_metacritic(controller, mock_ui):
     mock_ui.game_detail_metacritic.config.assert_called_once_with(
         text=f"Metacritic Score: N/A"
     )
+
+    mock_ui.game_detail_title.pack.assert_called_once_with(pady=(10, 5))
+    mock_ui.game_detail_release.pack.assert_called_once_with(pady=5)
+    mock_ui.game_detail_dev.pack.assert_called_once_with(pady=5)
+    mock_ui.game_detail_metacritic.pack.assert_called_once_with(pady=5)
 
 
 def test_process_game_details_success(controller):
