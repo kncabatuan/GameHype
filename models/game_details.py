@@ -20,7 +20,7 @@ class Game:
         
         custom_weights = {
             5: 1.00,
-            4: 0.75,
+            4: 0.75, 
             3: 0.25,
             1: 0.00
         }
@@ -33,7 +33,11 @@ class Game:
 
     @property
     def calculate_dampened_score(self):
+        if not self.ratings:
+            return None
+        
         raw_score, total_count = self.calculate_raw_score
 
         dampened_score = (raw_score + (DUMMY_COUNT * DUMMY_RATING))/(total_count + DUMMY_COUNT)
-        print(dampened_score)
+        
+        return dampened_score
