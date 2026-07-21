@@ -10,7 +10,7 @@ class Game:
         self.ratings = self.raw_data.get("ratings", [])
 
     @property
-    def calculate_hype_score(self):
+    def calculate_raw_score(self):
         df = pd.DataFrame(self.ratings)
         print(df)
         
@@ -21,7 +21,6 @@ class Game:
             1: 0.00
         }
 
-        df["hype_weights"] = df["id"].map(custom_weights)
-        custom_score = np.average(df["hype_weights"], weights=df["count"])
-
-        print(custom_score)
+        df["custom_weights"] = df["id"].map(custom_weights)
+        raw_score = (df["custom_weights"]*df["count"]).sum()
+        total_count = df["count"].sum()
