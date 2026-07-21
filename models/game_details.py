@@ -16,7 +16,6 @@ class Game:
     @property
     def calculate_raw_score(self):
         df = pd.DataFrame(self.ratings)
-        print(df)
         
         custom_weights = {
             5: 1.00,

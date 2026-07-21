@@ -88,6 +88,7 @@ class UIController:
             self.ui.list_box_frame.pack_forget()
 
             self.ui.entry_box.config(state="disabled")
+            self.ui.main_button.config(state="disabled")
 
             thread = threading.Thread(
                 target=self.get_game_details, args=(selected_game,)
@@ -119,6 +120,7 @@ class UIController:
         self.ui.entry_box.config(state="normal")
         self.status_display_controller("check_hype")
         self.ui.entry_box.icursor(tk.END)
+        self.ui.main_button.config(state="active")
 
     def display_game_image(self, photo: ImageTk.PhotoImage) -> None:
         if photo:
