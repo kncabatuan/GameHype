@@ -209,6 +209,8 @@ class UIController:
             messagebox.showerror(
                 "No input", "There is no input. Please enter a valid game title"
             )
+        
+        self.game.calculate_hype_score
 
     def status_display_controller(self, status: str) -> None:
         match status:
