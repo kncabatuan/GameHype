@@ -2,6 +2,10 @@ import pandas as pd
 import numpy as np
 from typing import Dict, Any
 
+#Bayesian Average Constants:
+DUMMY_COUNT = 25
+DUMMY_RATING = 0.50
+
 
 class Game:
     def __init__(self, raw_data: Dict[str, Any]):
@@ -24,3 +28,12 @@ class Game:
         df["custom_weights"] = df["id"].map(custom_weights)
         raw_score = (df["custom_weights"]*df["count"]).sum()
         total_count = df["count"].sum()
+
+        return [raw_score, total_count]
+
+    @property
+    def calculate_dampened_score(self):
+        raw_score, total_count = self.calculate_raw_score
+
+        dampened_score = (raw_score + (DUMMY_COUNT * DUMMY_RATING))/(total_count + DUMMY_COUNT)
+        print(dampened_score)

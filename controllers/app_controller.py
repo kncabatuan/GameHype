@@ -210,7 +210,7 @@ class UIController:
                 "No input", "There is no input. Please enter a valid game title"
             )
         
-        self.game.calculate_raw_score
+        self.game.calculate_dampened_score
 
     def status_display_controller(self, status: str) -> None:
         match status:
