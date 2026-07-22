@@ -169,8 +169,33 @@ class AppUI:
         self.create_image_display()
         self.create_game_details_display()
 
-
 def open_ui() -> None:
     window = tk.Tk()
     app_ui = AppUI(window)
     app_ui.root.mainloop()
+
+
+class VerdictWindow(tk.Toplevel):
+    def __init__(self, parent, game_title, score, category):
+        super().__init__(parent)
+
+        self.title(f"Hype Analysis - {game_title}")
+        self.geometry("380x250")
+        self.resizable(False, False)
+
+        self.transient(parent)
+        self.grab_set()
+
+        self.build_ui(game_title, score, category)
+    
+    def build_ui(self, title, score, category):
+        title_label = tk.Label(self, text=title, font=("Arial", 18), wraplength=340)
+        score_label = tk.Label(self, text=f"Score: {score}", font=("Arial", 18))
+        category_label = tk.Label(self, text=category, font=("Arial", 18))
+
+        title_label.pack(pady=(20, 10))
+        score_label.pack(pady=5)
+        category_label.pack(pady=15)
+
+        close_button = tk.Button(self, text="Close", command=self.destroy)
+        close_button.pack(pady=(10,0))
