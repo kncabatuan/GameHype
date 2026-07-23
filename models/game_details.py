@@ -38,5 +38,22 @@ class Game:
         raw_score, total_count = self.calculate_raw_score
 
         dampened_score = (raw_score + (DUMMY_COUNT * DUMMY_RATING))/(total_count + DUMMY_COUNT)
-        
+
         return dampened_score
+    
+    def get_verdict(self):
+        score = self.calculate_dampened_score * 100
+        verdict = ""
+
+        if score >= 85:
+            verdict = "🐐 GOTY Material"
+        elif score >= 70:
+            verdict = "🔥 Certified Banger"
+        elif score >= 50:
+            verdict = "🍿 Mid (Wait for Steam Sale)"
+        elif score >= 30:
+            verdict = "🚨 Overhyped Disappointment"
+        else:
+            verdict = "🗑️ Nuclear Dumpster Fire"
+
+        return score, verdict
