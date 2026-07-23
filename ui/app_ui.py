@@ -180,7 +180,11 @@ class VerdictWindow(tk.Toplevel):
         super().__init__(parent)
 
         self.title(f"Hype Analysis - {game_title}")
-        self.geometry("380x250")
+        screen_height = parent.winfo_screenheight()
+        screen_width = parent.winfo_screenwidth()
+        y = (screen_height - 400) // 2
+        x = (screen_width - 400) // 2
+        self.geometry(f"380x250+{x}+{y}")
         self.resizable(False, False)
 
         self.transient(parent)
