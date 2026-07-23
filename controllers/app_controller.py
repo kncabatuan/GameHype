@@ -6,6 +6,7 @@ from models import game_details
 from PIL import Image, ImageTk
 from tkinter import messagebox
 from typing import List, Any, TYPE_CHECKING
+from ui import app_ui
 
 from api import rawg_service
 
@@ -214,6 +215,8 @@ class UIController:
         
         title = self.game.raw_data.get("name", "Not Available")
         score, verdict = self.game.get_verdict()
+
+        app_ui.VerdictWindow(self.ui.root, title, score, verdict)
 
     def status_display_controller(self, status: str) -> None:
         match status:
