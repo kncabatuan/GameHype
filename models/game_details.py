@@ -42,7 +42,7 @@ class Game:
         return dampened_score
     
     def get_verdict(self):
-        score = self.calculate_dampened_score * 100
+        score = round(self.calculate_dampened_score * 100, 2)
         verdict = ""
 
         if score >= 85:
