@@ -501,12 +501,28 @@ def test_on_mouse_wheel(controller, mock_ui):
 
 def test_on_go_click_success(controller, mock_ui):
     test_title = "stardew valley"
+    test_raw_data = {"name": "Stardew Valley"}
+    test_get_verdict_return = (89, "🐐 GOTY Material")
+
     mock_ui.entry_box.get.return_value = test_title
 
-    controller.on_go_click()
+    with patch("models.game_details.Game") as mock_game:
+        mock_game_instance = MagicMock()
+        mock_game_instance.raw_data = test_raw_data
+        mock_game_instance.get_verdict.return_value = test_get_verdict_return
 
-    mock_ui.entry_box.get.assert_called_once()
-    assert controller.game_title == test_title
+        mock_game.return_value = mock_game_instance
+
+        controller.game = mock_game.return_value
+
+        with patch("ui.app_ui.VerdictWindow") as mock_verdict_window:
+
+            controller.on_go_click()
+
+            mock_ui.entry_box.get.assert_called_once()
+            assert controller.game_title == test_title
+        
+            mock_verdict_window.assert_called_once_with(mock_ui.root, "Stardew Valley", 89, "🐐 GOTY Material")
 
 
 def test_on_go_click_fail(controller, mock_ui):

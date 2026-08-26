@@ -212,6 +212,7 @@ class UIController:
             messagebox.showerror(
                 "No input", "There is no input. Please enter a valid game title"
             )
+            return
         
         title = self.game.raw_data.get("name", "Not Available")
         score, verdict = self.game.get_verdict()
