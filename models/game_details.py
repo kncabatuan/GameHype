@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from api import steam_reviews
 from typing import Dict, Any
 
