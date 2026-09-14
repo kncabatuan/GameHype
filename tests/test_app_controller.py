@@ -24,7 +24,7 @@ def test_ui_init(controller, mock_ui):
     assert controller.debounce_counter is None
     assert controller.game_title is None
     assert controller.game_image is None
-    assert controller.game == game_details.Game
+    assert controller.game is None
 
 
 def test_on_key_release_timer_on(controller, mock_ui):
