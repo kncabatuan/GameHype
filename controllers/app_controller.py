@@ -21,7 +21,7 @@ class UIController:
         self.debounce_counter = None
         self.game_title = None
         self.game_image = None
-        self.game = game_details.Game
+        self.game = None
 
     def on_key_release(self, event) -> None:
         if self.debounce_counter:
@@ -211,6 +211,12 @@ class UIController:
         if not self.game_title:
             messagebox.showerror(
                 "No input", "There is no input. Please enter a valid game title"
+            )
+            return
+        if not self.game:
+            messagebox.showerror(
+                "No game details",
+                "There are no game details available. Please select a game from the list.",
             )
             return
         
