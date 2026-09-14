@@ -1,21 +1,24 @@
 import pandas as pd
 import numpy as np
+from api import steam_reviews
 from typing import Dict, Any
 
 #Bayesian Average Constants:
-DUMMY_COUNT = 25
-DUMMY_RATING = 0.50
+DUMMY_COUNT_FOR_RAWG = 25
+DUMMY_RATING_FOR_RAWG = 0.50
+DUMMY_COUNT_FOR_STEAM = 1000
+DUMMY_RATING_FOR_STEAM = 0.70
 
 
 class Game:
     def __init__(self, raw_data: Dict[str, Any]):
         self.raw_data = raw_data
         self.title = self.raw_data.get("name", None)
-        self.ratings = self.raw_data.get("ratings", [])
+        self.rawg_ratings = self.raw_data.get("ratings", [])
 
     @property
     def calculate_raw_score(self):
-        df = pd.DataFrame(self.ratings)
+        df = pd.DataFrame(self.rawg_ratings)
         
         custom_weights = {
             5: 1.00,
@@ -31,29 +34,50 @@ class Game:
         return [raw_score, total_count]
 
     @property
-    def calculate_dampened_score(self):
-        if not self.ratings:
+    def calculate_dampened_score_rawg(self):
+        if not self.rawg_ratings:
             return None
         
         raw_score, total_count = self.calculate_raw_score
 
-        dampened_score = (raw_score + (DUMMY_COUNT * DUMMY_RATING))/(total_count + DUMMY_COUNT)
+        dampened_score = (raw_score + (DUMMY_COUNT_FOR_RAWG * DUMMY_RATING_FOR_RAWG))/(total_count + DUMMY_COUNT_FOR_RAWG)
 
         return dampened_score
     
     def get_verdict(self):
-        score = round(self.calculate_dampened_score * 100, 2)
+        reviews_data = steam_reviews.get_steam_reviews(self.title)
+        if not reviews_data:
+            score = self.calculate_dampened_score_rawg
+        else:
+            positive_count = reviews_data.get("total_positive", 0)
+            negative_count = reviews_data.get("total_negative", 0)
+
+            score = self.calculate_dampened_score_steam(positive_count, negative_count)
+
+        return self.get_verdict_label(score)
+
+    def calculate_dampened_score_steam(self, positive_count, negative_count):
+        total_count = positive_count + negative_count
+        if total_count == 0:
+            return
+        
+        dampened_score = (positive_count + (DUMMY_COUNT_FOR_STEAM * DUMMY_RATING_FOR_STEAM)) / (total_count + DUMMY_COUNT_FOR_STEAM)
+
+        return dampened_score
+
+    def get_verdict_label(self, score):
+        rounded_score = round(score * 100, 2)
         verdict = ""
 
-        if score >= 85:
+        if rounded_score >= 90:
             verdict = "🐐 GOTY Material"
-        elif score >= 70:
+        elif rounded_score >= 70:
             verdict = "🔥 Certified Banger"
-        elif score >= 50:
+        elif rounded_score >= 50:
             verdict = "🍿 Mid (Wait for Steam Sale)"
-        elif score >= 30:
+        elif rounded_score >= 30:
             verdict = "🚨 Overhyped Disappointment"
         else:
             verdict = "🗑️ Nuclear Dumpster Fire"
 
-        return score, verdict
+        return rounded_score, verdict

@@ -215,8 +215,8 @@ class UIController:
             return
         
         title = self.game.raw_data.get("name", "Not Available")
-        score, verdict = self.game.get_verdict()
 
+        score, verdict = self.game.get_verdict()
         app_ui.VerdictWindow(self.ui.root, title, score, verdict)
 
     def status_display_controller(self, status: str) -> None:
