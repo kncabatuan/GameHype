@@ -1,4 +1,5 @@
 from models import game_details
+from unittest.mock import patch
 
 
 def test_game_class_init_success():
@@ -34,6 +35,26 @@ def test_game_class_init_fail():
     assert game.raw_data == {}
     assert game.title is None
     assert game.rawg_ratings == []
+
+
+def test_get_verdict_with_steam():
+    test_raw_data = {"name": "Test Game"}
+    test_steam_reviews = {
+        "total_positive": 100,
+        "total_negative": 25
+    }
+    calculated_score = (100 + (1000 * 0.70)) / (100 + 25 + 1000)
+    rounded_score = round(calculated_score * 100, 2)
+
+    with patch("api.steam_reviews.get_steam_reviews") as mock_get_steam_reviews:
+        mock_get_steam_reviews.return_value = test_steam_reviews
+
+        game = game_details.Game(test_raw_data)
+
+        verdict = game.get_verdict()
+
+        mock_get_steam_reviews.assert_called_once_with(game.title)
+        assert verdict == (rounded_score, "🔥 Certified Banger")
 
 
 def test_calculate_raw_score_success():
