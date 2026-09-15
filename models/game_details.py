@@ -15,6 +15,18 @@ class Game:
         self.title = self.raw_data.get("name", None)
         self.rawg_ratings = self.raw_data.get("ratings", [])
 
+    def get_verdict(self):
+        reviews_data = steam_reviews.get_steam_reviews(self.title)
+        if not reviews_data:
+            score = self.calculate_dampened_score_rawg
+        else:
+            positive_count = reviews_data.get("total_positive", 0)
+            negative_count = reviews_data.get("total_negative", 0)
+
+            score = self.calculate_dampened_score_steam(positive_count, negative_count)
+
+        return self.get_verdict_label(score)
+
     @property
     def calculate_raw_score(self):
         if not self.rawg_ratings:
@@ -45,18 +57,6 @@ class Game:
         dampened_score = (raw_score + (DUMMY_COUNT_FOR_RAWG * DUMMY_RATING_FOR_RAWG))/(total_count + DUMMY_COUNT_FOR_RAWG)
 
         return dampened_score
-    
-    def get_verdict(self):
-        reviews_data = steam_reviews.get_steam_reviews(self.title)
-        if not reviews_data:
-            score = self.calculate_dampened_score_rawg
-        else:
-            positive_count = reviews_data.get("total_positive", 0)
-            negative_count = reviews_data.get("total_negative", 0)
-
-            score = self.calculate_dampened_score_steam(positive_count, negative_count)
-
-        return self.get_verdict_label(score)
 
     def calculate_dampened_score_steam(self, positive_count, negative_count):
         total_count = positive_count + negative_count
