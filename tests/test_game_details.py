@@ -192,3 +192,32 @@ def test_calculate_dampened_score_steam_fail():
 
     assert dampened_score is None
 
+
+def test_get_verdict_label_success():
+    test_raw_data = {"name": "Test Game"}
+    game = game_details.Game(test_raw_data)
+
+    score = 0.95
+    verdict = game.get_verdict_label(score)
+
+    assert verdict == (score * 100, "🐐 GOTY Material")
+
+    score = 0.85
+    verdict = game.get_verdict_label(score)
+    assert verdict == (score * 100, "🔥 Certified Banger")
+
+    score = 0.50
+    verdict = game.get_verdict_label(score)
+    assert verdict == (score * 100, "🍿 Mid (Wait for Steam Sale)")
+
+    score = 0.35
+    verdict = game.get_verdict_label(score)
+    assert verdict == (score * 100, "🚨 Overhyped Disappointment")
+
+    score = 0.15
+    verdict = game.get_verdict_label(score)
+    assert verdict == (score * 100, "🗑️ Nuclear Dumpster Fire")
+
+    score = 0
+    verdict = game.get_verdict_label(score)
+    assert verdict == ("N/A", "N/A")

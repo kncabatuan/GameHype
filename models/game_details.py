@@ -79,7 +79,10 @@ class Game:
             verdict = "🍿 Mid (Wait for Steam Sale)"
         elif rounded_score >= 30:
             verdict = "🚨 Overhyped Disappointment"
-        else:
+        elif rounded_score > 0:
             verdict = "🗑️ Nuclear Dumpster Fire"
+        else:
+            rounded_score = "N/A"
+            verdict = "N/A"
 
         return rounded_score, verdict
