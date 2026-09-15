@@ -181,3 +181,14 @@ def test_calculate_dampened_score_steam_success():
     assert dampened_score == (positive_count + (game_details.DUMMY_COUNT_FOR_STEAM * game_details.DUMMY_RATING_FOR_STEAM)) / (positive_count + negative_count + game_details.DUMMY_COUNT_FOR_STEAM)
 
 
+def test_calculate_dampened_score_steam_fail():
+    test_raw_data = {"name": "Test Game"}
+    positive_count = 0
+    negative_count = 0
+
+    game = game_details.Game(test_raw_data)
+
+    dampened_score = game.calculate_dampened_score_steam(positive_count, negative_count)
+
+    assert dampened_score is None
+
