@@ -63,7 +63,18 @@ def test_calculate_raw_score_success():
     assert total_count == 100
 
 
+def test_calculate_raw_score_fail():
+    test_raw_data = {
+        "name": "Test Game",
+        "ratings": []
+    }
 
+    game = game_details.Game(test_raw_data)
+
+    raw_score, total_count = game.calculate_raw_score
+
+    assert raw_score == 0
+    assert total_count == 0
 
 
 
