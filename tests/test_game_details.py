@@ -57,7 +57,6 @@ def test_get_verdict_with_steam():
         assert verdict == (rounded_score, "🔥 Certified Banger")
 
 
-
 def test_get_verdict_without_steam():
     test_raw_data = {
         "name": "Test Game",
@@ -170,5 +169,15 @@ def test_calculate_dampened_score_rawg_fail():
     assert dampened_score is None
 
 
+def test_calculate_dampened_score_steam_success():
+    test_raw_data = {"name": "Test Game"}
+    positive_count = 100
+    negative_count = 25
+
+    game = game_details.Game(test_raw_data)
+
+    dampened_score = game.calculate_dampened_score_steam(positive_count, negative_count)
+
+    assert dampened_score == (positive_count + (game_details.DUMMY_COUNT_FOR_STEAM * game_details.DUMMY_RATING_FOR_STEAM)) / (positive_count + negative_count + game_details.DUMMY_COUNT_FOR_STEAM)
 
 
