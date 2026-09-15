@@ -114,3 +114,15 @@ def test_get_steam_reviews_success():
             mock_get.assert_called_once_with(test_reviews_url)
             mock_get_steam_id.assert_called_once_with(test_game_title)
             assert reviews_data == test_reviews_data["query_summary"]
+
+
+def test_get_steam_reviews_no_steam_id():
+    test_game_title = "Test Game"
+
+    with patch("api.steam_reviews.get_steam_id") as mock_get_steam_id:
+        mock_get_steam_id.return_value = None
+
+        reviews_data = steam_reviews.get_steam_reviews(test_game_title)
+
+        mock_get_steam_id.assert_called_once_with(test_game_title)
+        assert reviews_data == None
