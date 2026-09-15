@@ -1,3 +1,4 @@
+import requests
 from api import steam_reviews
 from unittest.mock import patch, Mock
 
@@ -33,3 +34,16 @@ def test_get_steam_id_no_game_title():
     steam_id = steam_reviews.get_steam_id(test_game_title)
     
     assert steam_id == None
+
+
+def test_get_steam_id_request_exception():
+    test_game_title = "Test Game"
+
+    with patch("requests.get") as mock_get:
+        mock_response = Mock()
+        mock_response.raise_for_status.side_effect = requests.exceptions.RequestException("Network error")
+        mock_get.return_value = mock_response
+
+        steam_id = steam_reviews.get_steam_id(test_game_title)
+
+        assert steam_id == None
