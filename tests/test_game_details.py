@@ -36,6 +36,36 @@ def test_game_class_init_fail():
     assert game.rawg_ratings == []
 
 
+def test_calculate_raw_score_success():
+    test_raw_data = {
+        "name": "Test Game",
+        "ratings": [
+            {
+                "id": 5,
+                "title": "exceptional",
+                "count": 50,
+                "percent": 50
+            },
+            {
+                "id": 4,
+                "title": "recommended",
+                "count": 50,
+                "percent": 50
+            }
+        ]
+    }
+
+    game = game_details.Game(test_raw_data)
+
+    raw_score, total_count = game.calculate_raw_score
+
+    assert raw_score == (50 * 1.00 + 50 * 0.85)
+    assert total_count == 100
+
+
+
+
+
 
 
 
