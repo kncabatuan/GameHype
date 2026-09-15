@@ -3,6 +3,15 @@ from typing import Any
 
 
 def get_steam_id(game_title: str) -> str | None:
+    """
+    Handles the API call to Steam to fetch the Steam ID for a given game title.
+
+    Args:
+        game_title (str): The title of the game to fetch the Steam ID for.
+
+    Returns:
+        str | None: The Steam ID of the game if found, otherwise None.
+    """
     if not game_title:
         return
 
@@ -26,11 +35,20 @@ def get_steam_id(game_title: str) -> str | None:
 
 
 def get_steam_reviews(game_title: str) -> dict[str, Any] | None:
+    """
+    Handles the API call to Steam to fetch reviews for a given game title.
+
+    Args:
+        game_title (str): The title of the game to fetch reviews for.
+
+    Returns:
+        dict[str, Any] | None: A dictionary containing the review summary if found, otherwise None.
+    """
     steam_id = get_steam_id(game_title)
 
     if not steam_id:
         return
-    
+
     try:
         REVIEWS_URL = f"https://store.steampowered.com/appreviews/{steam_id}?json=1&num_per_page=100"
         response = requests.get(REVIEWS_URL)
@@ -39,7 +57,5 @@ def get_steam_reviews(game_title: str) -> dict[str, Any] | None:
     except requests.exceptions.RequestException as e:
         print(f"Error fetching Steam reviews: {e}")
         return
-    
+
     return reviews_data.get("query_summary", {})
-
-

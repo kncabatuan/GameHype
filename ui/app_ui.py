@@ -4,7 +4,15 @@ from controllers import app_controller
 
 
 class AppUI:
+    """Creates the main app window and handles user interactions."""
+
     def __init__(self, root: tk.Tk) -> None:
+        """
+        Initializes the main application UI.
+
+        Args:
+            root (tk.Tk): The root Tkinter window.
+        """
         self.root = root
         self.controller = app_controller.UIController(self)
         self.left_frame = tk.Frame
@@ -22,6 +30,7 @@ class AppUI:
         self.create_widgets()
 
     def config_window(self) -> None:
+        """Configures the main application window's properties."""
         self.root.title("GameHype")
         screen_height = self.root.winfo_screenheight()
         screen_width = self.root.winfo_screenwidth()
@@ -31,6 +40,7 @@ class AppUI:
         self.root.resizable(False, False)
 
     def create_main_frames(self) -> None:
+        """Creates the main frames for the application layout."""
         self.root.columnconfigure(0, weight=1, uniform="group1")
         self.root.columnconfigure(1, weight=1, uniform="group1")
         self.root.rowconfigure(0, weight=1)
@@ -40,6 +50,7 @@ class AppUI:
         self.right_frame.grid(row=0, column=1, sticky="nsew")
 
     def create_main_header(self) -> None:
+        """Creates the main header label for the application."""
         main_label_frame = tk.Frame(self.left_frame)
         main_label_frame.pack(fill="x", pady=(10, 30))
 
@@ -49,6 +60,7 @@ class AppUI:
         main_label.pack(pady=40)
 
     def create_sub_header(self) -> None:
+        """Creates the sub-header label for the application."""
         sub_header_frame = tk.Frame(self.left_frame)
         sub_header_frame.pack(fill="x", pady=(0, 30))
 
@@ -60,6 +72,7 @@ class AppUI:
         sub_label.pack()
 
     def create_entry(self) -> None:
+        """Creates the entry box and list box for user input and game selection."""
         entry_frame = tk.Frame(self.left_frame, height=80)
         entry_frame.pack_propagate(False)
         entry_frame.pack(fill="x", pady=(0, 20), padx=20)
@@ -92,6 +105,7 @@ class AppUI:
         self.list_box.bind("<MouseWheel>", self.controller.on_mouse_wheel)
 
     def create_main_button(self) -> None:
+        """Creates the main "Go" button for the application."""
         main_button_frame = tk.Frame(self.left_frame)
         main_button_frame.pack(fill="x", pady=(0, 30))
 
@@ -115,6 +129,7 @@ class AppUI:
         )
 
     def create_status_display(self) -> None:
+        """Creates the status display label for the application."""
         status_display_frame = tk.Frame(self.left_frame)
         status_display_frame.pack(fill="x", pady=(10, 30))
 
@@ -124,6 +139,7 @@ class AppUI:
         self.status_display.pack()
 
     def create_image_display(self) -> None:
+        """Creates the image display area for the selected game."""
         image_display_frame = tk.Frame(self.right_frame, height=250)
         image_display_frame.pack_propagate(False)
         image_display_frame.pack(fill="x", pady=(10, 30))
@@ -141,6 +157,7 @@ class AppUI:
         self.image_label.pack(fill="both", expand=True)
 
     def create_game_details_display(self) -> None:
+        """Creates the game details display area for the selected game."""
         game_details_frame = tk.Frame(self.right_frame, height=250)
         game_details_frame.pack_propagate(False)
         game_details_frame.pack(pady=(10, 30), fill="x")
@@ -159,6 +176,7 @@ class AppUI:
         )
 
     def create_widgets(self) -> None:
+        """Creates all the widgets for the application UI."""
         self.config_window()
         self.create_main_frames()
         self.create_main_header()
@@ -169,14 +187,27 @@ class AppUI:
         self.create_image_display()
         self.create_game_details_display()
 
+
 def open_ui() -> None:
+    """Opens the main application UI."""
     window = tk.Tk()
     app_ui = AppUI(window)
     app_ui.root.mainloop()
 
 
 class VerdictWindow(tk.Toplevel):
+    """Displays the verdict of the hype analysis in a separate window."""
+
     def __init__(self, parent, game_title, score, category) -> None:
+        """
+        Initializes the verdict window.
+
+        Args:
+            parent (tk.Tk): The parent Tkinter window.
+            game_title (str): The title of the game.
+            score (float): The hype score of the game.
+            category (str): The category of the hype analysis.
+        """
         super().__init__(parent)
 
         self.title(f"Hype Analysis - {game_title}")
@@ -191,8 +222,9 @@ class VerdictWindow(tk.Toplevel):
         self.grab_set()
 
         self.build_ui(game_title, score, category)
-    
+
     def build_ui(self, title, score, category) -> None:
+        """Builds the UI components for the verdict window."""
         title_label = tk.Label(self, text=title, font=("Arial", 18), wraplength=340)
         score_label = tk.Label(self, text=f"Score: {score}", font=("Arial", 18))
         category_label = tk.Label(self, text=category, font=("Arial", 18))
@@ -202,4 +234,4 @@ class VerdictWindow(tk.Toplevel):
         category_label.pack(pady=15)
 
         close_button = tk.Button(self, text="Close", command=self.destroy)
-        close_button.pack(pady=(10,0))
+        close_button.pack(pady=(10, 0))

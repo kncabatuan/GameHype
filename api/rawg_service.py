@@ -8,6 +8,15 @@ api_key = os.getenv("RAWG_API_KEY")
 
 
 def get_game_titles(title_input: str) -> List[str]:
+    """
+    Handles the API call to RAWG to fetch game titles based on the user's input.
+
+    Args:
+        title_input (str): The user's input for the game title.
+
+    Returns:
+        List[str]: A list of game titles matching the user's input.
+    """
     if not api_key or not title_input:
         return []
 
@@ -24,6 +33,15 @@ def get_game_titles(title_input: str) -> List[str]:
 
 
 def get_game_details(game: str) -> Dict[str, Any]:
+    """
+    Handles the API call to RAWG to fetch detailed information about a specific game.
+
+    Args:
+        game (str): The name of the game to fetch details for.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing detailed information about the game.
+    """
     if not api_key or not game:
         return {}
 
