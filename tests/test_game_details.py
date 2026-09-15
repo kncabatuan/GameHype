@@ -221,3 +221,13 @@ def test_get_verdict_label_success():
     score = 0
     verdict = game.get_verdict_label(score)
     assert verdict == ("N/A", "N/A")
+
+
+def test_get_verdict_label_fail():
+    test_raw_data = {"name": "Test Game"}
+    game = game_details.Game(test_raw_data)
+
+    score = None
+    verdict = game.get_verdict_label(score)
+
+    assert verdict == ("N/A", "N/A")

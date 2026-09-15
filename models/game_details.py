@@ -68,6 +68,9 @@ class Game:
         return dampened_score
 
     def get_verdict_label(self, score):
+        if not score:
+            return "N/A", "N/A"
+            
         rounded_score = round(score * 100, 2)
         verdict = ""
 
