@@ -3,19 +3,19 @@ from api import steam_reviews
 from typing import Dict, Any
 
 #Bayesian Average Constants:
-DUMMY_COUNT_FOR_RAWG = 25
-DUMMY_RATING_FOR_RAWG = 0.50
-DUMMY_COUNT_FOR_STEAM = 1000
-DUMMY_RATING_FOR_STEAM = 0.70
+DUMMY_COUNT_FOR_RAWG : int = 25
+DUMMY_RATING_FOR_RAWG : float = 0.50
+DUMMY_COUNT_FOR_STEAM : int = 1000
+DUMMY_RATING_FOR_STEAM : float = 0.70
 
 
 class Game:
-    def __init__(self, raw_data: Dict[str, Any]):
+    def __init__(self, raw_data: Dict[str, Any]) -> None:
         self.raw_data = raw_data
         self.title = self.raw_data.get("name", None)
         self.rawg_ratings = self.raw_data.get("ratings", [])
 
-    def get_verdict(self):
+    def get_verdict(self) -> tuple[str, str]:
         reviews_data = steam_reviews.get_steam_reviews(self.title)
         if not reviews_data:
             score = self.calculate_dampened_score_rawg
@@ -28,7 +28,7 @@ class Game:
         return self.get_verdict_label(score)
 
     @property
-    def calculate_raw_score(self):
+    def calculate_raw_score(self) -> list[float, int]:
         if not self.rawg_ratings:
             return [0, 0]
         
@@ -48,7 +48,7 @@ class Game:
         return [raw_score, total_count]
 
     @property
-    def calculate_dampened_score_rawg(self):
+    def calculate_dampened_score_rawg(self) -> float | None:
         if not self.rawg_ratings:
             return None
         
@@ -58,7 +58,7 @@ class Game:
 
         return dampened_score
 
-    def calculate_dampened_score_steam(self, positive_count, negative_count):
+    def calculate_dampened_score_steam(self, positive_count, negative_count) -> float | None:
         total_count = positive_count + negative_count
         if total_count == 0:
             return
@@ -67,10 +67,10 @@ class Game:
 
         return dampened_score
 
-    def get_verdict_label(self, score):
+    def get_verdict_label(self, score) -> tuple[str, str]:
         if not score:
             return "N/A", "N/A"
-            
+
         rounded_score = round(score * 100, 2)
         verdict = ""
 

@@ -41,7 +41,7 @@ class UIController:
         thread.daemon = True
         thread.start()
 
-    def fetch_title_data(self, query_title) -> None:
+    def fetch_title_data(self, query_title: str) -> None:
         if len(query_title) >= 3:
             results = rawg_service.get_game_titles(query_title)
             self.ui.root.after(0, self.update_list_box, results)
@@ -68,14 +68,14 @@ class UIController:
         else:
             self.ui.list_box_frame.pack_forget()
 
-    def on_listbox_hover(self, event):
+    def on_listbox_hover(self, event) -> None:
         index = self.ui.list_box.nearest(event.y)
 
         self.ui.list_box.selection_clear(0, tk.END)
         self.ui.list_box.selection_set(index)
         self.ui.list_box.activate(index)
 
-    def on_listbox_click(self, event):
+    def on_listbox_click(self, event) -> None:
         index = self.ui.list_box.nearest(event.y)
 
         if index >= 0 and self.ui.list_box.size() > 0:
@@ -132,7 +132,7 @@ class UIController:
             self.ui.image_label.config(image="")
 
     def load_game_image(
-        self, image_url: str, target_height=200
+        self, image_url: str, target_height: int=200
     ) -> ImageTk.PhotoImage | None:
         try:
             response = requests.get(image_url, timeout=10)
@@ -150,7 +150,7 @@ class UIController:
 
         return ImageTk.PhotoImage(img)
 
-    def display_game_details(self, game_data: dict) -> None:
+    def display_game_details(self, game_data: dict[str, Any]) -> None:
 
         processed_data = self.process_game_details(game_data)
 
@@ -174,7 +174,7 @@ class UIController:
         self.ui.game_detail_dev.pack(pady=5)
         self.ui.game_detail_metacritic.pack(pady=5)
 
-    def process_game_details(self, game_data: dict) -> dict:
+    def process_game_details(self, game_data: dict[str, Any]) -> dict[str, Any]:
         game_title = game_data.get("name", "Not available")
         if len(game_title) > 50:
             game_title = game_title[:50] + "..."
@@ -201,12 +201,12 @@ class UIController:
         }
         return processed_data
 
-    def on_mouse_wheel(self, event):
+    def on_mouse_wheel(self, event) -> None:
         direction = int(-1 * (event.delta / 120))
         self.ui.list_box.yview_scroll(direction, "units")
         return "break"
 
-    def on_go_click(self):
+    def on_go_click(self) -> None:
         self.game_title = self.ui.entry_box.get()
         if not self.game_title:
             messagebox.showerror(

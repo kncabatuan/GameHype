@@ -176,7 +176,7 @@ def open_ui() -> None:
 
 
 class VerdictWindow(tk.Toplevel):
-    def __init__(self, parent, game_title, score, category):
+    def __init__(self, parent, game_title, score, category) -> None:
         super().__init__(parent)
 
         self.title(f"Hype Analysis - {game_title}")
@@ -192,7 +192,7 @@ class VerdictWindow(tk.Toplevel):
 
         self.build_ui(game_title, score, category)
     
-    def build_ui(self, title, score, category):
+    def build_ui(self, title, score, category) -> None:
         title_label = tk.Label(self, text=title, font=("Arial", 18), wraplength=340)
         score_label = tk.Label(self, text=f"Score: {score}", font=("Arial", 18))
         category_label = tk.Label(self, text=category, font=("Arial", 18))

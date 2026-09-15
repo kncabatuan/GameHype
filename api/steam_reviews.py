@@ -1,5 +1,5 @@
-import json
 import requests
+from typing import Any
 
 
 def get_steam_id(game_title: str) -> str | None:
@@ -25,7 +25,7 @@ def get_steam_id(game_title: str) -> str | None:
     return steam_id
 
 
-def get_steam_reviews(game_title: str) -> dict | None:
+def get_steam_reviews(game_title: str) -> dict[str, Any] | None:
     steam_id = get_steam_id(game_title)
 
     if not steam_id:
