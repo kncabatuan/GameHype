@@ -26,8 +26,14 @@ def test_game_class_init_success():
                 "percent": 100
             }
         ]
-    
 
+
+def test_game_class_init_fail():
+    game = game_details.Game({})
+
+    assert game.raw_data == {}
+    assert game.title is None
+    assert game.rawg_ratings == []
 
 
 
