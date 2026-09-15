@@ -57,6 +57,39 @@ def test_get_verdict_with_steam():
         assert verdict == (rounded_score, "🔥 Certified Banger")
 
 
+
+def test_get_verdict_without_steam():
+    test_raw_data = {
+        "name": "Test Game",
+        "ratings": [
+            {
+                "id": 5,
+                "title": "exceptional",
+                "count": 50,
+                "percent": 50
+            },
+            {
+                "id": 4,
+                "title": "recommended",
+                "count": 50,
+                "percent": 50
+            }
+        ]
+    }
+    calculated_score = (50 * 1.00 + 50 * 0.85 + (game_details.DUMMY_COUNT_FOR_RAWG * game_details.DUMMY_RATING_FOR_RAWG)) / (100 + game_details.DUMMY_COUNT_FOR_RAWG)
+    rounded_score = round(calculated_score * 100, 2)
+
+    with patch("api.steam_reviews.get_steam_reviews") as mock_get_steam_reviews:
+        mock_get_steam_reviews.return_value = None
+
+        game = game_details.Game(test_raw_data)
+
+        verdict = game.get_verdict()
+
+        mock_get_steam_reviews.assert_called_once_with(game.title)
+        assert verdict == (rounded_score, "🔥 Certified Banger")
+
+
 def test_calculate_raw_score_success():
     test_raw_data = {
         "name": "Test Game",
