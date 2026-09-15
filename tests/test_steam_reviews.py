@@ -64,3 +64,27 @@ def test_get_steam_id_no_items_in_response():
 
         mock_get.assert_called_once_with(test_steamid_url)
         assert steam_id == None
+
+
+def test_get_steam_id_no_id():
+    test_game_title = "Test Game"
+    test_steamid_url = f"https://store.steampowered.com/api/storesearch/?term={test_game_title}&l=english&cc=US"
+    test_response_data = {
+        "items": [
+            {
+                "type": "app",
+                "name": "Test Game",
+            }
+        ]
+    }
+
+    with patch("requests.get") as mock_get:
+        mock_response = Mock()
+        mock_response.json.return_value = test_response_data
+        mock_response.raise_for_status.return_value = None
+        mock_get.return_value = mock_response
+
+        steam_id = steam_reviews.get_steam_id(test_game_title)
+
+        mock_get.assert_called_once_with(test_steamid_url)
+        assert steam_id == None
