@@ -103,6 +103,17 @@ def test_calculate_dampened_score_rawg_success():
     assert dampened_score == (50 * 1.00 + 50 * 0.85 + (game_details.DUMMY_COUNT_FOR_RAWG * game_details.DUMMY_RATING_FOR_RAWG)) / (100 + game_details.DUMMY_COUNT_FOR_RAWG)
 
 
+def test_calculate_dampened_score_rawg_fail():
+    test_raw_data = {
+        "name": "Test Game",
+        "ratings": []
+    }
+
+    game = game_details.Game(test_raw_data)
+
+    dampened_score = game.calculate_dampened_score_rawg
+
+    assert dampened_score is None
 
 
 
