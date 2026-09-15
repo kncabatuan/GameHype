@@ -17,6 +17,9 @@ class Game:
 
     @property
     def calculate_raw_score(self):
+        if not self.rawg_ratings:
+            return [0, 0]
+        
         df = pd.DataFrame(self.rawg_ratings)
         
         custom_weights = {
