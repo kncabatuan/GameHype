@@ -25,3 +25,11 @@ def test_get_steam_id_success():
 
         mock_get.assert_called_once_with(test_steamid_url)
         assert steam_id == 1000
+
+
+def test_get_steam_id_no_game_title():
+    test_game_title = None
+
+    steam_id = steam_reviews.get_steam_id(test_game_title)
+    
+    assert steam_id == None
