@@ -58,4 +58,4 @@ def get_steam_reviews(game_title: str) -> dict[str, Any] | None:
         print(f"Error fetching Steam reviews: {e}")
         return
 
-    return reviews_data.get("query_summary", {})
+    return reviews_data.get("query_summary", None)

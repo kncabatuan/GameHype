@@ -163,4 +163,4 @@ def test_get_steam_reviews_no_query_summary():
 
             mock_get.assert_called_once_with(test_reviews_url)
             mock_get_steam_id.assert_called_once_with(test_game_title)
-            assert reviews_data == {}
+            assert reviews_data is None
