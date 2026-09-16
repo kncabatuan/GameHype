@@ -51,6 +51,7 @@ def test_on_key_release_no_timer_yet(controller, mock_ui):
 
 def test_start_get_titles_thread_success(controller, mock_ui):
     test_game_title = "stardew valley"
+    test_token = 1
 
     mock_ui.entry_box.get.return_value = test_game_title
 
@@ -62,7 +63,7 @@ def test_start_get_titles_thread_success(controller, mock_ui):
 
         mock_ui.entry_box.get.assert_called_once()
         mock_thread.assert_called_once_with(
-            target=controller.fetch_title_data, args=(test_game_title,)
+            target=controller.fetch_title_data, args=(test_game_title, test_token)
         )
         assert mock_thread.return_value.daemon == True
         mock_thread.return_value.start.assert_called_once()
@@ -86,11 +87,13 @@ def test_start_get_titles_thread_no_title(controller, mock_ui):
 
 def test_fetch_title_data_success(controller, mock_ui):
     test_game_title = "stardew valley"
+    test_token = 1
+    controller.request_token = 1
 
     with patch("api.rawg_service.get_game_titles") as mock_get_game_titles:
         mock_get_game_titles.return_value = ["stardew valley 1", "stardew valley 2"]
 
-        controller.fetch_title_data(test_game_title)
+        controller.fetch_title_data(test_game_title, test_token)
 
         mock_get_game_titles.assert_called_once_with(test_game_title)
         mock_ui.root.after.assert_called_once_with(
@@ -100,8 +103,10 @@ def test_fetch_title_data_success(controller, mock_ui):
 
 def test_fetch_title_data_fail(controller, mock_ui):
     test_game_title = "st"
+    test_token = 1
+    controller.request_token = 1
 
-    controller.fetch_title_data(test_game_title)
+    controller.fetch_title_data(test_game_title, test_token)
 
     mock_ui.root.after.assert_called_once_with(0, mock_ui.list_box_frame.pack_forget)
 

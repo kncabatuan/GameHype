@@ -26,6 +26,7 @@ class UIController:
         self.ui = ui
         self.display = "Ready to process"
         self.debounce_counter = None
+        self.request_token = 0
         self.game_title = None
         self.game_image = None
         self.game = None
@@ -50,12 +51,15 @@ class UIController:
             self.remove_game_details()
             self.status_display_controller("ready")
             return None
+        
+        self.request_token += 1
+        current_token = self.request_token
 
-        thread = threading.Thread(target=self.fetch_title_data, args=(query_title,))
+        thread = threading.Thread(target=self.fetch_title_data, args=(query_title, current_token,))
         thread.daemon = True
         thread.start()
 
-    def fetch_title_data(self, query_title: str) -> None:
+    def fetch_title_data(self, query_title: str, token: int) -> None:
         """
         Calls rawg_service.get_game_titles to fetch game titles based on user input and updates the listbox in the UI.
 
@@ -64,7 +68,9 @@ class UIController:
         """
         if len(query_title) >= 3:
             results = rawg_service.get_game_titles(query_title)
-            self.ui.root.after(0, self.update_list_box, results)
+            
+            if token == self.request_token:
+                self.ui.root.after(0, self.update_list_box, results)
         else:
             self.ui.root.after(0, self.ui.list_box_frame.pack_forget)
 
