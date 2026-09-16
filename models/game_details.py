@@ -42,7 +42,7 @@ class Game:
         return self.get_verdict_label(score)
 
     @property
-    def calculate_raw_score(self) -> list[float, int]:
+    def calculate_raw_score(self) -> tuple[float, int]:
         """
         Calculates the raw score based on the RAWG ratings and returns the raw score and total count.
 
