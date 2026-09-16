@@ -192,6 +192,7 @@ def open_ui() -> None:
     """Opens the main application UI."""
     window = tk.Tk()
     app_ui = AppUI(window)
+    app_ui.root.protocol("WM_DELETE_WINDOW", app_ui.controller.on_closing())
     app_ui.root.mainloop()
 
 

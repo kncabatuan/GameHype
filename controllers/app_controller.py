@@ -340,3 +340,10 @@ class UIController:
         self.ui.game_detail_dev.pack_forget()
         self.ui.game_detail_metacritic.pack_forget()
         self.ui.image_label.config(image="")
+
+    def on_closing(self) -> None:
+        if self.debounce_counter:
+            self.ui.root.after_cancel(self.debounce_counter)
+            self.debounce_counter = None
+        
+        self.ui.root.destroy()
