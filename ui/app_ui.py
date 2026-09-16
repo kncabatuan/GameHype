@@ -227,7 +227,7 @@ class VerdictWindow(tk.Toplevel):
     def build_ui(self, title, score, category) -> None:
         """Builds the UI components for the verdict window."""
         title_label = tk.Label(self, text=title, font=("Arial", 18), wraplength=340)
-        score_label = tk.Label(self, text=f"Score: {score}", font=("Arial", 18))
+        score_label = tk.Label(self, text=f"Score: {score} / 100", font=("Arial", 18))
         category_label = tk.Label(self, text=category, font=("Arial", 18))
 
         title_label.pack(pady=(20, 10))
