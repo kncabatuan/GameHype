@@ -5,7 +5,9 @@ from unittest.mock import patch, Mock
 
 def test_get_steam_id_success():
     test_game_title = "Test Game"
-    test_steamid_url = f"https://store.steampowered.com/api/storesearch/?term={test_game_title}&l=english&cc=US"
+    test_steamid_url = f"https://store.steampowered.com/api/storesearch/"
+    test_payload = {"term": test_game_title, "l": "english", "cc": "US"}
+
     test_response_data = {
         "items": [
             {
@@ -24,7 +26,7 @@ def test_get_steam_id_success():
 
         steam_id = steam_reviews.get_steam_id(test_game_title)
 
-        mock_get.assert_called_once_with(test_steamid_url)
+        mock_get.assert_called_once_with(test_steamid_url, params=test_payload, timeout=10)
         assert steam_id == 1000
 
 
@@ -51,7 +53,9 @@ def test_get_steam_id_request_exception():
 
 def test_get_steam_id_no_items_in_response():
     test_game_title = "Test Game"
-    test_steamid_url = f"https://store.steampowered.com/api/storesearch/?term={test_game_title}&l=english&cc=US"
+    test_steamid_url = f"https://store.steampowered.com/api/storesearch/"
+    test_payload = {"term": test_game_title, "l": "english", "cc": "US"}
+
     test_response_data = {}
 
     with patch("requests.get") as mock_get:
@@ -62,13 +66,15 @@ def test_get_steam_id_no_items_in_response():
 
         steam_id = steam_reviews.get_steam_id(test_game_title)
 
-        mock_get.assert_called_once_with(test_steamid_url)
+        mock_get.assert_called_once_with(test_steamid_url, params=test_payload, timeout=10)
         assert steam_id == None
 
 
 def test_get_steam_id_no_id():
     test_game_title = "Test Game"
-    test_steamid_url = f"https://store.steampowered.com/api/storesearch/?term={test_game_title}&l=english&cc=US"
+    test_steamid_url = f"https://store.steampowered.com/api/storesearch/"
+    test_payload = {"term": test_game_title, "l": "english", "cc": "US"}
+
     test_response_data = {
         "items": [
             {
@@ -86,13 +92,15 @@ def test_get_steam_id_no_id():
 
         steam_id = steam_reviews.get_steam_id(test_game_title)
 
-        mock_get.assert_called_once_with(test_steamid_url)
+        mock_get.assert_called_once_with(test_steamid_url, params=test_payload, timeout=10)
         assert steam_id == None
 
 
 def test_get_steam_reviews_success():
     test_game_title = "Test Game"
-    test_reviews_url = f"https://store.steampowered.com/appreviews/1000?json=1&num_per_page=100"
+    test_reviews_url = f"https://store.steampowered.com/appreviews/1000"
+    test_payload = {"json": 1, "num_per_page": 100}
+
     test_reviews_data = {
         "query_summary": {
             "total_positive": 100,
@@ -111,7 +119,7 @@ def test_get_steam_reviews_success():
 
             reviews_data = steam_reviews.get_steam_reviews(test_game_title)
 
-            mock_get.assert_called_once_with(test_reviews_url)
+            mock_get.assert_called_once_with(test_reviews_url, params=test_payload, timeout=10)
             mock_get_steam_id.assert_called_once_with(test_game_title)
             assert reviews_data == test_reviews_data["query_summary"]
 
@@ -147,7 +155,9 @@ def test_get_steam_reviews_request_exception():
 
 def test_get_steam_reviews_no_query_summary():
     test_game_title = "Test Game"
-    test_reviews_url = f"https://store.steampowered.com/appreviews/1000?json=1&num_per_page=100"
+    test_reviews_url = f"https://store.steampowered.com/appreviews/1000"
+    test_payload = {"json": 1, "num_per_page": 100}
+
     test_reviews_data = {}
 
     with patch("api.steam_reviews.get_steam_id") as mock_get_steam_id:
@@ -161,6 +171,6 @@ def test_get_steam_reviews_no_query_summary():
 
             reviews_data = steam_reviews.get_steam_reviews(test_game_title)
 
-            mock_get.assert_called_once_with(test_reviews_url)
+            mock_get.assert_called_once_with(test_reviews_url, params=test_payload, timeout=10)
             mock_get_steam_id.assert_called_once_with(test_game_title)
             assert reviews_data is None

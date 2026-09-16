@@ -15,10 +15,11 @@ def get_steam_id(game_title: str) -> str | None:
     if not game_title:
         return
 
-    STEAMID_URL = f"https://store.steampowered.com/api/storesearch/?term={game_title}&l=english&cc=US"
+    STEAMID_URL = f"https://store.steampowered.com/api/storesearch/"
+    payload = {"term": game_title, "l": "english", "cc": "US"}
 
     try:
-        response = requests.get(STEAMID_URL)
+        response = requests.get(STEAMID_URL, params=payload, timeout=10)
         response.raise_for_status()
         data = response.json()
     except requests.exceptions.RequestException as e:
@@ -49,9 +50,11 @@ def get_steam_reviews(game_title: str) -> dict[str, Any] | None:
     if not steam_id:
         return
 
+    REVIEWS_URL = f"https://store.steampowered.com/appreviews/{steam_id}"
+    payload = {"json": 1, "num_per_page": 100}
+
     try:
-        REVIEWS_URL = f"https://store.steampowered.com/appreviews/{steam_id}?json=1&num_per_page=100"
-        response = requests.get(REVIEWS_URL)
+        response = requests.get(REVIEWS_URL, params=payload, timeout=10)
         response.raise_for_status()
         reviews_data = response.json()
     except requests.exceptions.RequestException as e:
