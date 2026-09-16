@@ -20,10 +20,11 @@ def get_game_titles(title_input: str) -> List[str]:
     if not api_key or not title_input:
         return []
 
-    url = f"https://api.rawg.io/api/games?search={title_input}&key={api_key}"
+    url = f"https://api.rawg.io/api/games"
+    payload = {"search": title_input, "key": api_key}
 
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, params=payload, timeout=10)
         response.raise_for_status()
         data = response.json()
     except requests.exceptions.RequestException:
@@ -45,10 +46,11 @@ def get_game_details(game: str) -> Dict[str, Any]:
     if not api_key or not game:
         return {}
 
-    url = f"https://api.rawg.io/api/games?search={game}&key={api_key}"
+    url = f"https://api.rawg.io/api/games"
+    payload = {"search": game, "key": api_key}
 
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, params=payload, timeout=10)
         response.raise_for_status()
         data_json = response.json()
     except requests.exceptions.RequestException:
